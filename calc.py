@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 class App:
-    def __init__(self, master, columns=6):
+    def __init__(self, master, columns=5):
         # Make frame, child of master
         f = tk.Frame(master)
         #Initialize grid to 40px wide columns
@@ -19,7 +19,6 @@ class App:
         # with the command which will then be appended to the
         # "command line", with the exception of functions
         for i,(button,buttonInf) in enumerate(buttons):
-            print(button[0])
             tk.Button(f,text=button).grid(column=column,row=row)
             
             logging.info("Button: {} at row {} col {}".format(button,row,column))
@@ -49,6 +48,7 @@ buttons = [
     ('x10','*10'),
     ('Ans','ANS'),
     ('=',App.parse_line),
+    ('eh','eh'),
     ('1',1),
     ('2',2),
     ('3',3),
