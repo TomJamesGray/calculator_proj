@@ -7,6 +7,28 @@ logging.basicConfig(level=logging.DEBUG)
 
 class App:
     def __init__(self, master, columns=5):
+        buttons = [
+            ('7',7),
+            ('8',8),
+            ('9',9),
+            ('(','('),
+            (')',')'),
+            ('4',4),
+            ('5',5),
+            ('6',6),
+            ('x','*'),
+            ('/','/'),
+            ('1',1),
+            ('2',2),
+            ('3',3),
+            ('+','+'),
+            ('-','-'),
+            ('0',0),
+            ('.','.'),
+            ('x10','*10'),
+            ('Ans','ANS'),
+            ('=',self.parse_line)
+        ]
         # Make frame, child of master
         f = tk.Frame(master)
         #Initialize grid to 40px wide columns
@@ -18,7 +40,7 @@ class App:
         #option streches the textbox horizontally to use up all the space available
         self.calc_screen = tk.Entry(f)
         self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
-       
+        print("Calc screen contents: {}".format(self.calc_screen.get()))
         #Initialise variables for loop for button grid
         row, column = 1, 0
         
@@ -39,44 +61,27 @@ class App:
                 column += 1
     
     def button_handler(self,buttonFunction):
-        print(buttonFunction)
-        if isinstance(buttonFunction, types.FunctionType):
+        if isinstance(buttonFunction, types.MethodType):
             buttonFunction()
         else:
+            #print(self.calc_screen.get())
             self.calc_screen.insert(tk.END,buttonFunction)
     
-    def parse_line(self,line):
+    def parse_line(self):
+        #TODO Handling for dividing by zero, ANS, etc.
+        ans = eval(self.calc_screen.get())
+
+        #Clear calc screen and insert answer
+        self.calc_screen.delete(0,'end')
+        self.calc_screen.insert(0,ans)
         return True
     
     def clear_line(self):
         return True
 
 
-buttons = [
-    ('7',7),
-    ('8',8),
-    ('9',9),
-    ('(','('),
-    (')',')'),
-    ('4',4),
-    ('5',5),
-    ('6',6),
-    ('x','*'),
-    ('/','/'),
-    ('1',1),
-    ('2',2),
-    ('3',3),
-    ('+','+'),
-    ('-','-'),
-    ('0',0),
-    ('.','.'),
-    ('x10','*10'),
-    ('Ans','ANS'),
-    ('=',App.parse_line)
-]
 
-
-        
 root = tk.Tk()
 app = App(root)
+
 root.mainloop()
