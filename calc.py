@@ -16,7 +16,8 @@ class App:
         #option streches the textbox horizontally to use up all the space available
         self.calcScreen = tk.Entry(f).grid(column=0,row=0,columnspan=columns,
                 sticky=tk.E+tk.W)
-        
+       
+        #Initialise variables for loop for button grid
         row, column = 1, 0
         # Loop through buttons and create button
         # with the command which will then be appended to the
@@ -42,35 +43,7 @@ class App:
     def clear_line(self):
         return True
 
-#Dict of buttons for the calculator
-#key is the display text and the value is the value to 
-#be appended to the line or the function to be executed
-_buttons = [
-    ('0',0),
-    ('.','.'),
-    ('x10','*10'),
-    ('Ans','ANS'),
-    ('=',App.parse_line),
-    ('eh','eh'),
-    ('1',1),
-    ('2',2),
-    ('3',3),
-    ('+','+'),
-    ('-','-'),
-    ('1/x','1/ANS'),
-    ('4',4),
-    ('5',5),
-    ('6',6),
-    ('x','*'),
-    ('÷','/'),
-    ('±','±'), # What to do with this?
-    ('7',7),
-    ('8',8),
-    ('9',9),
-    ('(','('),
-    (')',')'),
-    ('C',App.clear_line),
-]
+
 buttons = [
     ('7',7),
     ('8',8),
