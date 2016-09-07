@@ -23,7 +23,7 @@ class App:
             
             logging.info("Button: {} at row {} col {}".format(button,row,column))
             #Create a new row if needed
-            if i % columns == 0 and i != 0:
+            if column == columns - 1:
                 logging.info("Creating new row at: {}".format(i))
                 row += 1
                 column = 0
