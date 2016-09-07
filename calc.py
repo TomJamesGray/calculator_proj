@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import tkinter as tk
 import logging
+from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
 class App:
@@ -14,7 +15,7 @@ class App:
 
         #Create entry box to display the sum for the calculator, the sticky
         #option streches the textbox horizontally to use up all the space available
-        self.calcScreen = tk.Entry(f).grid(column=0,row=0,columnspan=columns,
+        self.calc_screen = tk.Entry(f).grid(column=0,row=0,columnspan=columns,
                 sticky=tk.E+tk.W)
        
         #Initialise variables for loop for button grid
@@ -22,24 +23,26 @@ class App:
         # Loop through buttons and create button
         # with the command which will then be appended to the
         # "command line", with the exception of functions
-        for i,(button,buttonInf) in enumerate(buttons):
-            tk.Button(f,text=button,width=3).grid(column=column,row=row)
+        for button,button_inf in buttons:
+            tk.Button(f,text=button,width=3,command=partial(
+                self.button_handler,button_inf)).grid(column=column,row=row)
             
             logging.info("Button: {} at row {} col {}".format(button,row,column))
             #Create a new row if needed
             if column == columns - 1:
-                logging.info("Creating new row at: {}".format(i))
+                logging.info("Creating new row at: {}".format(button))
                 row += 1
                 column = 0
             else:
                 column += 1
-
-
-
-
+    
+    def button_handler(self,buttonFunction):
+        print(buttonFunction)
+        return True
+    
     def parse_line(self,line):
         return True
-
+    
     def clear_line(self):
         return True
 
