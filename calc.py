@@ -20,6 +20,7 @@ class App:
        
         #Initialise variables for loop for button grid
         row, column = 1, 0
+        
         # Loop through buttons and create button
         # with the command which will then be appended to the
         # "command line", with the exception of functions
@@ -56,7 +57,7 @@ buttons = [
     ('4',4),
     ('5',5),
     ('6',6),
-    ('x','x'),
+    ('x','*'),
     ('/','/'),
     ('1',1),
     ('2',2),
