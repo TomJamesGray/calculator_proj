@@ -42,7 +42,7 @@ class App:
 #Dict of buttons for the calculator
 #key is the display text and the value is the value to 
 #be appended to the line or the function to be executed
-buttons = [
+_buttons = [
     ('0',0),
     ('.','.'),
     ('x10','*10'),
@@ -67,6 +67,19 @@ buttons = [
     ('(','('),
     (')',')'),
     ('C',App.clear_line),
+]
+buttons = [
+    ('7',7),
+    ('8',8),
+    ('9',9),
+    ('(','('),
+    (')',')'),
+    ('4',4),
+    ('5',5),
+    ('6',6),
+    ('x','x'),
+    ('/','/')
+
 ]
 
 
