@@ -12,14 +12,17 @@ class App:
             f.columnconfigure(column,minsize=40)
         f.pack()
 
-        #tk.Button(f,text="4").grid(column=0,row=1)
+        #Create entry box to display the sum for the calculator, the sticky
+        #option streches the textbox horizontally to use up all the space available
+        self.calcScreen = tk.Entry(f).grid(column=0,row=0,columnspan=columns,
+                sticky=tk.E+tk.W)
         
-        row, column = 0, 0
+        row, column = 1, 0
         # Loop through buttons and create button
         # with the command which will then be appended to the
         # "command line", with the exception of functions
         for i,(button,buttonInf) in enumerate(buttons):
-            tk.Button(f,text=button).grid(column=column,row=row)
+            tk.Button(f,text=button,width=3).grid(column=column,row=row)
             
             logging.info("Button: {} at row {} col {}".format(button,row,column))
             #Create a new row if needed
@@ -78,8 +81,17 @@ buttons = [
     ('5',5),
     ('6',6),
     ('x','x'),
-    ('/','/')
-
+    ('/','/'),
+    ('1',1),
+    ('2',2),
+    ('3',3),
+    ('+','+'),
+    ('-','-'),
+    ('0',0),
+    ('.','.'),
+    ('x10','*10'),
+    ('Ans','ANS'),
+    ('=',App.parse_line)
 ]
 
 
