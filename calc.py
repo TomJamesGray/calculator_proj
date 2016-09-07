@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import tkinter as tk
 import logging
+import types
 from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
@@ -15,8 +16,8 @@ class App:
 
         #Create entry box to display the sum for the calculator, the sticky
         #option streches the textbox horizontally to use up all the space available
-        self.calc_screen = tk.Entry(f).grid(column=0,row=0,columnspan=columns,
-                sticky=tk.E+tk.W)
+        self.calc_screen = tk.Entry(f)
+        self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
        
         #Initialise variables for loop for button grid
         row, column = 1, 0
@@ -39,7 +40,10 @@ class App:
     
     def button_handler(self,buttonFunction):
         print(buttonFunction)
-        return True
+        if isinstance(buttonFunction, types.FunctionType):
+            buttonFunction()
+        else:
+            self.calc_screen.insert(tk.END,buttonFunction)
     
     def parse_line(self,line):
         return True
