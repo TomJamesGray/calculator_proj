@@ -40,9 +40,12 @@ class App:
         #option streches the textbox horizontally to use up all the space available
         self.calc_screen = tk.Entry(f)
         self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
-        print("Calc screen contents: {}".format(self.calc_screen.get()))
+
+        self.calc_answer_screen = tk.Label(f,justify='left')
+        self.calc_answer_screen.grid(column=0,row=1,columnspan=columns,
+                sticky=tk.E+tk.W)
         #Initialise variables for loop for button grid
-        row, column = 1, 0
+        row, column = 2, 0
         
         # Loop through buttons and create button
         # with the command which will then be appended to the
@@ -71,9 +74,8 @@ class App:
         #TODO Handling for dividing by zero, ANS, etc.
         ans = eval(self.calc_screen.get())
 
-        #Clear calc screen and insert answer
-        self.calc_screen.delete(0,'end')
-        self.calc_screen.insert(0,ans)
+        #Insert ans to answer_screen
+        self.calc_answer_screen['text'] = ans
         return True
     
     def clear_line(self):
