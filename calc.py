@@ -76,16 +76,18 @@ class App:
             self.calc_screen.insert(tk.END,buttonFunction)
     
     def parse_line(self):
-        #Parse ANS, replcaing it with self.prev_ans
         calc_line = self.calc_screen.get()
+        #Replace "ANS" with the prev_ans
         calc_line = calc_line.replace("ANS",str(self.prev_ans))
+            
         try:
             #TODO Handling for dividing by zero, ANS, etc.
             ans = eval(calc_line)
             self.prev_ans = ans
         except ZeroDivisionError:
             ans = "can't divide by zero"
-            self.prev_ans = None
+            #Default the previous answer to zero
+            self.prev_ans = 0
 
 
         #Insert ans to answer_screen
