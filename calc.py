@@ -120,6 +120,7 @@ class App:
 
     def clear_line(self):
         self.calc_screen.delete(0,'end')
+
 root = tk.Tk()
 app = App(root)
 
