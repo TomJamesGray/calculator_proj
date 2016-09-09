@@ -12,7 +12,7 @@ class App:
             ('cos','cos('),
             ('tan','tan('),
             ('^','**'),
-            ('!','!'),
+            ('C',self.clear_line),
             ('7',7),
             ('8',8),
             ('9',9),
@@ -118,6 +118,8 @@ class App:
         self.clear_on_next_button = True
         return True
 
+    def clear_line(self):
+        self.calc_screen.delete(0,'end')
 root = tk.Tk()
 app = App(root)
 
