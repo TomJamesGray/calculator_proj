@@ -112,11 +112,6 @@ class App:
 
         self.clear_on_next_button = True
         return True
-    
-    def clear_line(self):
-        return True
-
-
 
 root = tk.Tk()
 app = App(root)
