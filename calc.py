@@ -77,10 +77,11 @@ class App:
     
     def parse_line(self):
         #Parse ANS, replcaing it with self.prev_ans
-        self.calc_screen.get().replace("ANS",self.prev_ans)
+        calc_line = self.calc_screen.get()
+        calc_line = calc_line.replace("ANS",str(self.prev_ans))
         try:
             #TODO Handling for dividing by zero, ANS, etc.
-            ans = eval(self.calc_screen.get())
+            ans = eval(calc_line)
             self.prev_ans = ans
         except ZeroDivisionError:
             ans = "can't divide by zero"
