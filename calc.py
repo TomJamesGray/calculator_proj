@@ -29,6 +29,8 @@ class App:
             ('Ans','ANS'),
             ('=',self.parse_line)
         ]
+        self.clear_on_next_button = False
+        self.prev_ans = None
         # Make frame, child of master
         f = tk.Frame(master)
         #Initialize grid to 40px wide columns
@@ -64,6 +66,9 @@ class App:
                 column += 1
     
     def button_handler(self,buttonFunction):
+        if self.clear_on_next_button:
+            #Clear calc_screen
+            pass
         if isinstance(buttonFunction, types.MethodType):
             buttonFunction()
         else:
@@ -71,11 +76,21 @@ class App:
             self.calc_screen.insert(tk.END,buttonFunction)
     
     def parse_line(self):
-        #TODO Handling for dividing by zero, ANS, etc.
-        ans = eval(self.calc_screen.get())
+        #Parse ANS, replcaing it with self.prev_ans
+        self.calc_screen.get().replace("ANS",self.prev_ans)
+        try:
+            #TODO Handling for dividing by zero, ANS, etc.
+            ans = eval(self.calc_screen.get())
+            self.prev_ans = ans
+        except ZeroDivisionError:
+            ans = "can't divide by zero"
+            self.prev_ans = None
+
 
         #Insert ans to answer_screen
         self.calc_answer_screen['text'] = ans
+
+        self.clear_on_next_button = True
         return True
     
     def clear_line(self):
