@@ -66,13 +66,22 @@ class App:
                 column += 1
     
     def button_handler(self,buttonFunction):
-        if self.clear_on_next_button:
-            #Clear calc_screen
-            pass
+        """
+        Handles all button presses and either runs the
+        function if the button is assigned to a function or class method
+        or append the string or int to the calculator screen.
+        """
         if isinstance(buttonFunction, types.MethodType):
             buttonFunction()
         else:
-            #print(self.calc_screen.get())
+            #Only clear_on_next_button if the button isn't a function
+            #this means the ANS can be incremented just by pressing '='
+            if self.clear_on_next_button:
+                #Clear calc_screen
+                self.calc_screen.delete(0,'end')
+                #Reset clear_on_next_button now
+                self.clear_on_next_button = False
+            
             self.calc_screen.insert(tk.END,buttonFunction)
     
     def parse_line(self):
