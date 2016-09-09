@@ -8,6 +8,11 @@ logging.basicConfig(level=logging.DEBUG)
 class App:
     def __init__(self, master, columns=5):
         buttons = [
+            ('sin','sin('),
+            ('cos','cos('),
+            ('tan','tan('),
+            ('^','**'),
+            ('!','!'),
             ('7',7),
             ('8',8),
             ('9',9),
