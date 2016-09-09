@@ -71,6 +71,7 @@ class App:
         function if the button is assigned to a function or class method
         or append the string or int to the calculator screen.
         """
+
         if isinstance(buttonFunction, types.MethodType):
             buttonFunction()
         else:
@@ -85,6 +86,13 @@ class App:
             self.calc_screen.insert(tk.END,buttonFunction)
     
     def parse_line(self):
+        """
+        Parses the line from the calculator screen, and replaces ANS with
+        the previous answer and outputs the answer to calc_answer_screen.
+        prev_ans is also set, however in case of an error such as division
+        by 0 the previous answer defaults to 0
+        """
+
         calc_line = self.calc_screen.get()
         #Replace "ANS" with the prev_ans
         calc_line = calc_line.replace("ANS",str(self.prev_ans))
