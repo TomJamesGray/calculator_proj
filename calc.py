@@ -2,11 +2,14 @@
 import tkinter as tk
 import logging
 import types
+import re
 from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
 class App:
     def __init__(self, master, columns=5):
+        #Define buttons and their functions/strings to be implemented
+        #on press
         buttons = [
             ('sin','sin('),
             ('cos','cos('),
@@ -34,6 +37,7 @@ class App:
             ('Ans','ANS'),
             ('=',self.parse_line)
         ]
+        #Define basic properties now to prevent ValueErrors on first button
         self.clear_on_next_button = False
         self.prev_ans = None
         # Make frame, child of master
@@ -101,6 +105,12 @@ class App:
         calc_line = self.calc_screen.get()
         #Replace "ANS" with the prev_ans
         calc_line = calc_line.replace("ANS",str(self.prev_ans))
+
+        #Split calc_line by "(" and ")", so sin,cos and tan with nested
+        #brackets can be worked out easier
+        split_calc_line = re.split(r'[(\((.*?)\))]',calc_line)
+
+        print(split_calc_line)
             
         try:
             #TODO Handling for dividing by zero, ANS, etc.
