@@ -3,6 +3,7 @@ import tkinter as tk
 import logging
 import types
 import re
+import math
 from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
@@ -109,16 +110,25 @@ class App:
         #Split calc_line by "(" and ")", so sin,cos and tan with nested
         #brackets can be worked out easier
         split_calc_line = re.split(r'[\(|\)]',calc_line)
-        
-        for section in split_calc_line:
-            if section.endswith="sin":
-                
-
         print(split_calc_line)
-            
+        parsed_calc_line = []
+        parsed = False
+        for i,elem in enumerate(split_calc_line):
+            if elem.endswith("sin"):
+                parsed_calc_line.append(eval
+                #Evaluate the next item of the array as the arg for 
+                #the sin function, using degrees, which have to be
+                #converted to raidans firstly
+                parsed_calc_line.append(str(math.sin(math.radians(
+                    eval(split_calc_line[i+1])))))
+                split_calc_line[i+1] = ""
+            else:
+                parsed_calc_line.append(elem)
+        
+        print(parsed_calc_line)
+        ans = eval("".join(parsed_calc_line))
         try:
             #TODO Handling for dividing by zero, ANS, etc.
-            ans = eval(calc_line)
             self.prev_ans = ans
         except ZeroDivisionError:
             ans = "can't divide by zero"
