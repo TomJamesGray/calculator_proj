@@ -108,7 +108,11 @@ class App:
 
         #Split calc_line by "(" and ")", so sin,cos and tan with nested
         #brackets can be worked out easier
-        split_calc_line = re.split(r'[(\((.*?)\))]',calc_line)
+        split_calc_line = re.split(r'[\(|\)]',calc_line)
+        
+        for section in split_calc_line:
+            if section.endswith="sin":
+                
 
         print(split_calc_line)
             
