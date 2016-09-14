@@ -105,8 +105,22 @@ class App:
         def parse_sin(arg_list):
             """Handle the use of sin recursively
             """
+            arg_str = ""
             logging.info("arg_list: {}".format(arg_list))
-            return True
+            for i,elem in enumerate(arg_list):
+                if elem == "sin" and i != 0:
+                    recieved_ans = parse_sin(arg_list[i:])
+                    print("Recieved ans: {}".format(recieved_ans))
+                    arg_str =recieved_ans
+            print("arg_str {}".format(arg_str))
+            if arg_str != "":
+                ans = str(math.sin(math.radians(eval(
+                    arg_str))))
+            else:
+                ans = str(math.sin(math.radians(eval(
+                    arg_list[2]))))
+            logging.info("ans for sin is {}".format(ans))
+            return ans
 
 
         calc_line = self.calc_screen.get()
