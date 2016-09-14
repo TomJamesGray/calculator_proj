@@ -107,13 +107,14 @@ class App:
             """
             arg_str = ""
             logging.info("arg_list: {}".format(arg_list))
+            #Go through arg_list and recall parse_sin if there's nested
+            #sin's
             for i,elem in enumerate(arg_list):
                 if elem == "sin" and i != 0:
                     recieved_ans = parse_sin(arg_list[i:])
-                    print("Recieved ans: {}".format(recieved_ans))
                     arg_str = arg_list[i-1] + recieved_ans
 
-            print("arg_str {}".format(arg_str))
+            logging.info("arg_str {}".format(arg_str))
             if arg_str != "":
                 ans = str(math.sin(math.radians(eval(
                     arg_str))))
@@ -159,8 +160,6 @@ class App:
                         #Add j to i, so that any other nested sin's don't get 
                         #passed to parse_sin again
                         i += j
-                        
-
             else:
                 parsed_calc_line.append(split_calc_line[i])
             
@@ -170,13 +169,14 @@ class App:
                 i += 1
 
 
-        print(parsed_calc_line)
-        ans = eval("".join(parsed_calc_line))
+        logging.info("Parsed line to eval: {}".format(parsed_calc_line))
         try:
+            ans = eval("".join(parsed_calc_line))
             #TODO Handling for dividing by zero, ANS, etc.
             self.prev_ans = ans
         except ZeroDivisionError:
             ans = "can't divide by zero"
+            logging.error("Tried to divide by zero")
             #Default the previous answer to zero
             self.prev_ans = 0
 
