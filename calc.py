@@ -111,7 +111,8 @@ class App:
                 if elem == "sin" and i != 0:
                     recieved_ans = parse_sin(arg_list[i:])
                     print("Recieved ans: {}".format(recieved_ans))
-                    arg_str =recieved_ans
+                    arg_str = arg_list[i-1] + recieved_ans
+
             print("arg_str {}".format(arg_str))
             if arg_str != "":
                 ans = str(math.sin(math.radians(eval(
