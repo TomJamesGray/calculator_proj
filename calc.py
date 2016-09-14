@@ -102,13 +102,21 @@ class App:
         prev_ans is also set, however in case of an error such as division
         by 0 the previous answer defaults to 0
         """
+        def parse_sin(arg_list):
+            """Handle the use of sin recursively
+            """
+            print("arg_list: {}".format(arg_list))
+            return True
+
 
         calc_line = self.calc_screen.get()
         #Replace "ANS" with the prev_ans
         calc_line = calc_line.replace("ANS",str(self.prev_ans))
 
         #Split calc_line by sin, cos and tan
-        split_calc_line = re.split(r'(sin|cos|tan)',calc_line)
+        split_calc_line = re.split(r'(sin|cos|tan|\)|\()',calc_line)
+        #Strip list of blank elems
+        split_calc_line = list(filter(None,split_calc_line))
         print(split_calc_line)
 
         parsed_calc_line = []
@@ -117,10 +125,22 @@ class App:
         while not parsed:
             print("i = {}".format(i))
             if split_calc_line[i] == "sin":
-                print("Using sin")
-                parsed_calc_line.append(str(math.sin(math.radians(
-                    eval(split_calc_line[i+1])))))
-                split_calc_line[i+1] = ""
+                #Loop throught next list elems unitl final closing
+                #brakcet is found, as to handle nested brackets
+                #this is done on a sliced array, so the preceding 
+                #list elements are ignored
+                closingsToIgnore = 0
+                for j,elem in enumerate(split_calc_line[i:]):
+                    if elem == "(":
+                        closingsToIgnore += 1
+                    #Closing bracket can be ignored as it belongs to
+                    #another opening bracket
+                    elif elem == ")" and closingsToIgnore > 0:
+                        closingsToIgnore -= 1
+                    elif elem == ")" and closingsToIgnore == 0:
+                        parse_sin(split_calc_line[i:i+j])
+                        
+
             else:
                 parsed_calc_line.append(split_calc_line[i])
             
