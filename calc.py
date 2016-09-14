@@ -7,6 +7,16 @@ import math
 from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
+def nested_in(tuple_list,search_for,i=0):
+    """
+    Look in list of tuples for string at a specific index(default 0)
+    returns true if string is found and false if not
+    """
+    for t in tuple_list:
+        if search_for in t:
+            return True
+    return False
+
 class App:
     def __init__(self, master, columns=5):
         #Define buttons and their functions/strings to be implemented
@@ -102,6 +112,11 @@ class App:
         prev_ans is also set, however in case of an error such as division
         by 0 the previous answer defaults to 0
         """
+        special_functions = [
+            ('sin', lambda x: math.sin(math.radians(x))),
+            ('cos', lambda x: math.cos(math.radians(x))),
+            ('tan', lambda x: math.tan(math.radians(x)))
+        ]
         def parse_sin(arg_list):
             """Handle the use of sin recursively
             """
@@ -110,7 +125,7 @@ class App:
             #Go through arg_list and recall parse_sin if there's nested
             #sin's
             for i,elem in enumerate(arg_list):
-                if elem == "sin" and i != 0:
+                if nested_in(special_functions,elem) and i != 0:
                     recieved_ans = parse_sin(arg_list[i:])
                     arg_str = arg_list[i-1] + recieved_ans
 
@@ -140,7 +155,7 @@ class App:
         i = 0
         while not parsed:
             print("i = {}".format(split_calc_line[i]))
-            if split_calc_line[i] == "sin":
+            if nested_in(special_functions,split_calc_line[i]):
                 #Loop throught next list elems unitl final closing
                 #brakcet is found, as to handle nested brackets
                 
