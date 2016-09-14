@@ -10,11 +10,11 @@ logging.basicConfig(level=logging.DEBUG)
 def nested_in(tuple_list,search_for,i=0):
     """
     Look in list of tuples for string at a specific index(default 0)
-    returns true if string is found and false if not
+    returns the tuple if string is found and false if not
     """
     for t in tuple_list:
         if search_for in t:
-            return True
+            return t
     return False
 
 class App:
@@ -130,12 +130,12 @@ class App:
                     arg_str = arg_list[i-1] + recieved_ans
 
             logging.info("arg_str {}".format(arg_str))
+            #Get function required from special_functions
+            func = nested_in(special_functions,arg_list[0])[1]
             if arg_str != "":
-                ans = str(math.sin(math.radians(eval(
-                    arg_str))))
+                ans = str(func(eval(arg_str)))
             else:
-                ans = str(math.sin(math.radians(eval(
-                    arg_list[2]))))
+                ans = str(func(eval("".join(arg_list[2:]))))
             logging.info("ans for sin is {}".format(ans))
             return ans
 
