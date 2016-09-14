@@ -154,7 +154,10 @@ class App:
                     elif elem == ")" and closingsToIgnore > 0:
                         closingsToIgnore -= 1
                     elif elem == ")" and closingsToIgnore == 0:
-                        parse_sin(split_calc_line[i:i+j])
+                        parsed_calc_line.append(parse_sin(split_calc_line[i:i+j]))
+                        #Add j to i, so that any other nested sin's don't get 
+                        #passed to parse_sin again
+                        i += j
                         
 
             else:
