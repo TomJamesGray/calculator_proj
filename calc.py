@@ -198,10 +198,8 @@ class App:
             #Default the previous answer to zero
             self.prev_ans = 0
 
-
         #Insert ans to answer_screen with precision of 5
         self.calc_answer_screen['text'] = round(ans,max_precision_out)
-
         self.clear_on_next_button = True
         return True
 
