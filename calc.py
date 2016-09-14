@@ -107,24 +107,29 @@ class App:
         #Replace "ANS" with the prev_ans
         calc_line = calc_line.replace("ANS",str(self.prev_ans))
 
-        #Split calc_line by "(" and ")", so sin,cos and tan with nested
-        #brackets can be worked out easier
-        split_calc_line = re.split(r'[\(|\)]',calc_line)
+        #Split calc_line by sin, cos and tan
+        split_calc_line = re.split(r'(sin|cos|tan)',calc_line)
         print(split_calc_line)
+
         parsed_calc_line = []
         parsed = False
-        for i,elem in enumerate(split_calc_line):
-            if elem.endswith("sin"):
-                parsed_calc_line.append(eval
-                #Evaluate the next item of the array as the arg for 
-                #the sin function, using degrees, which have to be
-                #converted to raidans firstly
+        i = 0
+        while not parsed:
+            print("i = {}".format(i))
+            if split_calc_line[i] == "sin":
+                print("Using sin")
                 parsed_calc_line.append(str(math.sin(math.radians(
                     eval(split_calc_line[i+1])))))
                 split_calc_line[i+1] = ""
             else:
-                parsed_calc_line.append(elem)
-        
+                parsed_calc_line.append(split_calc_line[i])
+            
+            if i +1 == len(split_calc_line):
+                parsed = True
+            else:
+                i += 1
+
+
         print(parsed_calc_line)
         ans = eval("".join(parsed_calc_line))
         try:
