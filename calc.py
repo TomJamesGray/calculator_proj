@@ -7,6 +7,8 @@ import math
 from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
+max_precision_out = 5
+
 def nested_in(tuple_list,search_for,i=0):
     """
     Look in list of tuples for string at a specific index(default 0)
@@ -18,6 +20,7 @@ def nested_in(tuple_list,search_for,i=0):
     return False
 
 class App:
+    global max_precision_out
     def __init__(self, master, columns=5):
         #Define buttons and their functions/strings to be implemented
         #on press
@@ -117,16 +120,16 @@ class App:
             ('cos', lambda x: math.cos(math.radians(x))),
             ('tan', lambda x: math.tan(math.radians(x)))
         ]
-        def parse_sin(arg_list):
-            """Handle the use of sin recursively
+        def parse_special_func(arg_list):
+            """Handle the use of special_functions recursively
             """
             arg_str = ""
             logging.info("arg_list: {}".format(arg_list))
-            #Go through arg_list and recall parse_sin if there's nested
+            #Go through arg_list and recall parse_special_funcif there's nested
             #sin's
             for i,elem in enumerate(arg_list):
                 if nested_in(special_functions,elem) and i != 0:
-                    recieved_ans = parse_sin(arg_list[i:])
+                    recieved_ans = parse_special_func(arg_list[i:])
                     arg_str = arg_list[i-1] + recieved_ans
 
             logging.info("arg_str {}".format(arg_str))
@@ -171,9 +174,9 @@ class App:
                         closingsToIgnore -= 1
                         #TODO don't need closing bracket if it's last
                     elif elem == ")" and closingsToIgnore == 0:
-                        parsed_calc_line.append(parse_sin(split_calc_line[i:i+j]))
+                        parsed_calc_line.append(parse_special_func(split_calc_line[i:i+j]))
                         #Add j to i, so that any other nested sin's don't get 
-                        #passed to parse_sin again
+                        #passed to parse_special_func again
                         i += j
             else:
                 parsed_calc_line.append(split_calc_line[i])
@@ -196,8 +199,8 @@ class App:
             self.prev_ans = 0
 
 
-        #Insert ans to answer_screen
-        self.calc_answer_screen['text'] = ans
+        #Insert ans to answer_screen with precision of 5
+        self.calc_answer_screen['text'] = round(ans,max_precision_out)
 
         self.clear_on_next_button = True
         return True
