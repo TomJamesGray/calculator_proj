@@ -105,7 +105,7 @@ class App:
         def parse_sin(arg_list):
             """Handle the use of sin recursively
             """
-            print("arg_list: {}".format(arg_list))
+            logging.info("arg_list: {}".format(arg_list))
             return True
 
 
@@ -117,19 +117,20 @@ class App:
         split_calc_line = re.split(r'(sin|cos|tan|\)|\()',calc_line)
         #Strip list of blank elems
         split_calc_line = list(filter(None,split_calc_line))
-        print(split_calc_line)
+        logging.info("Split_calc_line after regex: {}".format(split_calc_line))
 
         parsed_calc_line = []
         parsed = False
         i = 0
         while not parsed:
-            print("i = {}".format(i))
+            print("i = {}".format(split_calc_line[i]))
             if split_calc_line[i] == "sin":
                 #Loop throught next list elems unitl final closing
                 #brakcet is found, as to handle nested brackets
-                #this is done on a sliced array, so the preceding 
-                #list elements are ignored
-                closingsToIgnore = 0
+                
+                #Set it to -1 so the opening bracket of the function
+                #will be ignored
+                closingsToIgnore = -1
                 for j,elem in enumerate(split_calc_line[i:]):
                     if elem == "(":
                         closingsToIgnore += 1
