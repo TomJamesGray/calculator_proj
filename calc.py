@@ -153,6 +153,7 @@ class App:
                     #another opening bracket
                     elif elem == ")" and closingsToIgnore > 0:
                         closingsToIgnore -= 1
+                        #TODO don't need closing bracket if it's last
                     elif elem == ")" and closingsToIgnore == 0:
                         parsed_calc_line.append(parse_sin(split_calc_line[i:i+j]))
                         #Add j to i, so that any other nested sin's don't get 
