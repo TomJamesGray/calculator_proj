@@ -11,6 +11,7 @@ class App(standard_calc.App):
 
         self.width, self.height = 600,600
         self.min_x,self.max_x = -20,20
+        self.sf = self.width/(abs(self.min_x)+abs(self.max_x))
 
         logging.info("Starting graphing mode")
         self.f = tk.Frame(master)
@@ -29,8 +30,16 @@ class App(standard_calc.App):
                 width=2)
 
         #Show intervals every 5 units
-
-        
+        for x in range(self.min_x,self.max_x+1,5):
+            if x != self.max_x:
+                self.canvas.create_text(x+self.width/2,self.height/2,anchor=tk.NW,
+                    text=str(x),tags=("x-axis","label"))
+            else:
+                self.canvas.create_text(x+self.width/2,self.height/2,anchor=tk.NE,
+                    text=str(x),tags=("x-axis","label"))
+            
+        self.canvas.scale("label",self.width/2,self.height/2,
+                self.sf,self.sf)
         self.f.pack()
 
     def graph_it(self):
@@ -49,5 +58,4 @@ class App(standard_calc.App):
         print(cords) 
         self.canvas.create_line(cords,tags="line",smooth=True,splinesteps=20)
         
-        sf = self.width/(abs(self.min_x)+abs(self.max_x))
-        self.canvas.scale("line",self.width/2,self.height/2,sf,sf)
+        self.canvas.scale("line",self.width/2,self.height/2,self.sf,self.sf)
