@@ -54,6 +54,17 @@ class App:
         #Define basic properties now to prevent ValueErrors on first button
         self.clear_on_next_button = False
         self.prev_ans = None
+        
+        #Make top level menubar
+        self.menu_bar = tk.Menu(master)
+        self.mode_bar = tk.Menu(self.menu_bar,tearoff=0)
+        self.mode_bar.add_command(label="Standard")
+        self.mode_bar.add_command(label="Graphing")
+        self.menu_bar.add_cascade(label="Mode",menu=self.mode_bar)
+
+        #Dispaly menu_bar
+        master.config(menu=self.menu_bar)
+
         # Make frame, child of master
         f = tk.Frame(master)
         #Initialize grid to 40px wide columns
