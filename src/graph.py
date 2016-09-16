@@ -2,10 +2,10 @@ import tkinter as tk
 #Don't know why the font isn't imported with the above import
 from tkinter import font
 import logging
-from src import standard_calc
+from src.standard_calc import parse_line
 
 
-class App(standard_calc.App):
+class App:
     def __init__(self, master):
         global width,height
 
@@ -65,8 +65,9 @@ class App(standard_calc.App):
             #Since co-ordinates are measured from top left, offset all
             #points by -200,-200
             cords.append((x+self.width/2,
-                -1*(eval(equation.replace("x",str(x))))+self.height/2))
+                -1*(parse_line(equation.replace("x",str(x))))+self.height/2))
+        
         print(cords) 
-        self.canvas.create_line(cords,tags="line",smooth=True,splinesteps=20)
+        self.canvas.create_line(cords,tags="line",smooth=True,splinesteps=50)
         
         self.canvas.scale("line",self.width/2,self.height/2,self.sf,self.sf)
