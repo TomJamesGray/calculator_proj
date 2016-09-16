@@ -64,8 +64,12 @@ class App:
         for x in range(self.min_x,self.max_x):
             #Since co-ordinates are measured from top left, offset all
             #points by -200,-200
-            cords.append((x+self.width/2,
-                -1*(parse_line(equation.replace("x",str(x))))+self.height/2))
+            try:
+                cords.append((x+self.width/2,
+                    -1*(parse_line(equation.replace("x",str(x))))+self.height/2))
+            except ZeroDivisionError:
+                self.equation_box.delete(0,'end')
+                return False
         
         print(cords) 
         self.canvas.create_line(cords,tags="line",smooth=True,splinesteps=50)

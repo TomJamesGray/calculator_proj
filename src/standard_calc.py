@@ -101,9 +101,9 @@ def parse_line(calc_line,prev_ans=None):
     logging.info("Parsed line to eval: {}".format(parsed_calc_line))
     try:
         ans = eval("".join(parsed_calc_line))
-    except ZeroDivisionError:
-        ans = "can't divide by zero"
+    except ZeroDivisionError as e:
         logging.error("Tried to divide by zero")
+        raise(e)
 
     return ans
 
