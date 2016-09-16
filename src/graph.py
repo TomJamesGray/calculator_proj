@@ -1,4 +1,6 @@
 import tkinter as tk
+#Don't know why the font isn't imported with the above import
+from tkinter import font
 import logging
 from src import standard_calc
 
@@ -12,12 +14,13 @@ class App(standard_calc.App):
 
         logging.info("Starting graphing mode")
         self.f = tk.Frame(master)
-        self.equation_box = tk.Entry(self.f)
+        self.equation_box = tk.Entry(self.f,font=font.Font(size=16))
         self.equation_box.grid(column=0,row=0)
         
         tk.Button(self.f,command=lambda: self.graph_it()).grid(column=0,row=1)
         
-        self.canvas = tk.Canvas(self.f,width=self.width,height=self.height,bg="#FFFFFF")
+        self.canvas = tk.Canvas(self.f,width=self.width,height=self.height,
+                bg="#FFFFFF")
         self.canvas.grid(column=1,row=0)
         #Draw graph axes
         self.canvas.create_line(0,self.height/2,self.width,self.height/2,fill="#AAAAAA",tags="x-axis",
@@ -25,7 +28,8 @@ class App(standard_calc.App):
         self.canvas.create_line(self.width/2,0,self.width/2,self.height,fill="#AAAAAA",tags="y-axis",
                 width=2)
 
-        #Show intervals every 5px
+        #Show intervals every 5 units
+
         
         self.f.pack()
 
