@@ -1,8 +1,14 @@
 import tkinter as tk
-from calculator import standard_calc
+import logging
+from src import standard_calc
 
-class Graphing(calc.App):
+class App(standard_calc.App):
     def __init__(self, master):
-        self.equation_box = tk.Entry(master)
-        self.canvas = tk.Canvas(width=500,height=300)
+        logging.info("Starting graphing mode")
+        self.f = tk.Frame(master)
+        self.equation_box = tk.Entry(self.f)
+        self.canvas = tk.Canvas(self.f,width=500,height=300,bg="#FF00FF")
+
+
+        self.f.pack()
 
