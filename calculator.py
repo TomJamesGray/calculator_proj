@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import tkinter as tk
-from src import standard_calc, graph
+from src import root_setup
 
 if __name__ == "__main__":
-    #Default to standard_calc on startup
-    root = tk.Tk()
-    app = standard_calc.App(root)
+    root_setup.setup("graph")

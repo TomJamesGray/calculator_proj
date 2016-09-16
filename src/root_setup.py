@@ -1,28 +1,27 @@
 import tkinter as tk
 from src import standard_calc, graph
 
-root, f = None,None
-def setup():
-    global root, f
+def setup(mode="standard"):
     """Create root level window, returning a frame
     """
     root = tk.Tk()
-    f = root.Frame()
     
     #Make top level menubar
-    self.menu_bar = tk.Menu(master)
-    self.mode_bar = tk.Menu(self.menu_bar,tearoff=0)
-    self.mode_bar.add_command(label="Standard",command=
-            lambda master: standard_calc.App(f))
-    self.mode_bar.add_command(label="Graphing",command=
-            lambda master: graph.App(f))
-    self.menu_bar.add_cascade(label="Mode",menu=self.mode_bar)
+    menu_bar = tk.Menu(root)
+    mode_bar = tk.Menu(menu_bar,tearoff=0)
+    mode_bar.add_command(label="Standard",command=
+            lambda: setup("standard"))
+    mode_bar.add_command(label="Graphing",command=
+        lambda: setup("graph"))
+    menu_bar.add_cascade(label="Mode",menu=mode_bar)
 
     #Dispaly menu_bar
-    master.config(menu=self.menu_bar)
-    
-    return f
+    root.config(menu=menu_bar)
 
-def switch_mode(
+    if mode == "standard":
+        standard_calc.App(root)
+    elif mode == "graph":
+        graph.App(root)
 
+    root.mainloop()
 
