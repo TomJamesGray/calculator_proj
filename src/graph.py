@@ -11,6 +11,8 @@ class App(standard_calc.App):
 
         self.width, self.height = 600,600
         self.min_x,self.max_x = -20,20
+        self.min_y,self.max_y = -20,20
+
         self.sf = self.width/(abs(self.min_x)+abs(self.max_x))
 
         logging.info("Starting graphing mode")
@@ -29,7 +31,8 @@ class App(standard_calc.App):
         self.canvas.create_line(self.width/2,0,self.width/2,self.height,fill="#AAAAAA",tags="y-axis",
                 width=2)
 
-        #Show intervals every 5 units
+        #Show intervals every 5 units, add 1 to max_x, so it's
+        #included in the loop
         for x in range(self.min_x,self.max_x+1,5):
             if x != self.max_x:
                 self.canvas.create_text(x+self.width/2,self.height/2,anchor=tk.NW,
@@ -37,9 +40,17 @@ class App(standard_calc.App):
             else:
                 self.canvas.create_text(x+self.width/2,self.height/2,anchor=tk.NE,
                     text=str(x),tags=("x-axis","label"))
-            
+         
+        for y in range(self.min_y,self.max_y+1,5):
+            if y != self.max_y:
+                self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.NW,
+                    text=str(-1*y),tags=("y-axis","label"))
+            else:
+                self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.SW,
+                    text=str(-1*y),tags=("y-axis","label"))
+        
         self.canvas.scale("label",self.width/2,self.height/2,
-                self.sf,self.sf)
+            self.sf,self.sf)
         self.f.pack()
 
     def graph_it(self):
