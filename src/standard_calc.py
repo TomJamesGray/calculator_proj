@@ -57,6 +57,8 @@ def parse_line(calc_line,prev_ans=None):
 
     #Replace "ANS" with the prev_ans
     calc_line = calc_line.replace("ANS",str(prev_ans))
+    #Replcae "^" with **
+    calc_line = calc_line.replace("^","**")
 
     #Split calc_line by sin, cos and tan
     split_calc_line = re.split(r'(sin|cos|tan|\)|\()',calc_line)
