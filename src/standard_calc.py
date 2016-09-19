@@ -20,7 +20,7 @@ def nested_in(tuple_list,search_for,i=0):
     return False
 
 
-def parse_line(calc_line,prev_ans=None):
+def parse_line(calc_line,prev_ans=None,**kwargs):
     """
     Parses the line from the calculator screen, and replaces ANS with
     the previous answer and outputs the answer to calc_answer_screen.
@@ -57,6 +57,9 @@ def parse_line(calc_line,prev_ans=None):
 
     #Replace "ANS" with the prev_ans
     calc_line = calc_line.replace("ANS",str(prev_ans))
+    #Replace kwargs name with the value
+    for name, value in kwargs.items():
+        calc_line = calc_line.replace(name,str(value))
     #Replcae "^" with **
     calc_line = calc_line.replace("^","**")
 
@@ -70,7 +73,6 @@ def parse_line(calc_line,prev_ans=None):
     parsed = False
     i = 0
     while not parsed:
-        print("i = {}".format(split_calc_line[i]))
         if nested_in(special_functions,split_calc_line[i]):
             #Loop throught next list elems unitl final closing
             #brakcet is found, as to handle nested brackets
