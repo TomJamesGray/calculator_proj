@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import tkinter as tk
+from tkinter import font
 import logging
 import types
 import re
@@ -8,7 +9,10 @@ from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
 max_precision_out = 5
-
+default_colours = {
+    'bg':'#282828',
+    'button_col':'#CACACA'
+}
 def nested_in(tuple_list,search_for,i=0):
     """
     Look in list of tuples for string at a specific index(default 0)
@@ -113,7 +117,7 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
 
 class App:
     global max_precision_out
-    def __init__(self, master, columns=5):
+    def __init__(self, master, columns=5,colours=default_colours):
         #Define buttons and their functions/strings to be implemented
         #on press
         buttons = [
@@ -148,18 +152,17 @@ class App:
         self.prev_ans = None
         
         # Make frame, child of master
-        f = tk.Frame(master)
+        f = tk.Frame(master,bg=colours['bg'])
         #Initialize grid to 40px wide columns
         for column in range(columns):
-            f.columnconfigure(column,minsize=40,pad=5)
-        f.pack()
+            f.columnconfigure(column)
 
         #Create entry box to display the sum for the calculator, the sticky
         #option streches the textbox horizontally to use up all the space available
-        self.calc_screen = tk.Entry(f)
+        self.calc_screen = tk.Entry(f,font=font.Font(size=16,family="Arial"))
         self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
 
-        self.calc_answer_screen = tk.Label(f,justify='left')
+        self.calc_answer_screen = tk.Label(f,justify='left',bg=colours['bg'])
         self.calc_answer_screen.grid(column=0,row=1,columnspan=columns,
                 sticky=tk.E+tk.W)
         #Initialise variables for loop for button grid
@@ -169,8 +172,9 @@ class App:
         # with the command which will then be appended to the
         # "command line", with the exception of functions
         for button,button_inf in buttons:
-            tk.Button(f,text=button,width=3,relief=tk.GROOVE,overrelief=tk.GROOVE,
-                    command=partial(self.button_handler,button_inf)) .grid(
+            tk.Button(f,text=button,width=3,bg=colours['button_col'],
+                    relief=tk.GROOVE,overrelief=tk.GROOVE,
+                    command=partial(self.button_handler,button_inf)).grid(
                             column=column,row=row)
             
             logging.info("Button: {} at row {} col {}".format(button,row,column))
@@ -181,7 +185,7 @@ class App:
                 column = 0
             else:
                 column += 1
-    
+        f.pack() 
     def button_handler(self,buttonFunction):
         """
         Handles all button presses and either runs the
