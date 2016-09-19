@@ -151,7 +151,7 @@ class App:
         f = tk.Frame(master)
         #Initialize grid to 40px wide columns
         for column in range(columns):
-            f.columnconfigure(column,minsize=40)
+            f.columnconfigure(column,minsize=40,pad=5)
         f.pack()
 
         #Create entry box to display the sum for the calculator, the sticky
@@ -169,8 +169,9 @@ class App:
         # with the command which will then be appended to the
         # "command line", with the exception of functions
         for button,button_inf in buttons:
-            tk.Button(f,text=button,width=3,command=partial(
-                self.button_handler,button_inf)).grid(column=column,row=row)
+            tk.Button(f,text=button,width=3,relief=tk.GROOVE,overrelief=tk.GROOVE,
+                    command=partial(self.button_handler,button_inf)) .grid(
+                            column=column,row=row)
             
             logging.info("Button: {} at row {} col {}".format(button,row,column))
             #Create a new row if needed
