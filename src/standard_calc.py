@@ -9,10 +9,6 @@ from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
 max_precision_out = 5
-default_colours = {
-    'bg':'#282828',
-    'button_col':'#CACACA'
-}
 def nested_in(tuple_list,search_for,i=0):
     """
     Look in list of tuples for string at a specific index(default 0)
@@ -117,7 +113,7 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
 
 class App:
     global max_precision_out
-    def __init__(self, master, columns=5,colours=default_colours):
+    def __init__(self, master, columns=5):
         #Define buttons and their functions/strings to be implemented
         #on press
         buttons = [
@@ -152,7 +148,7 @@ class App:
         self.prev_ans = None
         
         # Make frame, child of master
-        f = tk.Frame(master,bg=colours['bg'])
+        f = tk.Frame(master)
         #Initialize grid to 40px wide columns
         for column in range(columns):
             f.columnconfigure(column)
@@ -162,7 +158,7 @@ class App:
         self.calc_screen = tk.Entry(f,font=font.Font(size=16,family="Arial"))
         self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
 
-        self.calc_answer_screen = tk.Label(f,justify='left',bg=colours['bg'])
+        self.calc_answer_screen = tk.Label(f,justify='left')
         self.calc_answer_screen.grid(column=0,row=1,columnspan=columns,
                 sticky=tk.E+tk.W)
         #Initialise variables for loop for button grid
@@ -172,7 +168,7 @@ class App:
         # with the command which will then be appended to the
         # "command line", with the exception of functions
         for button,button_inf in buttons:
-            tk.Button(f,text=button,width=3,bg=colours['button_col'],
+            tk.Button(f,text=button,width=3,
                     relief=tk.GROOVE,overrelief=tk.GROOVE,
                     command=partial(self.button_handler,button_inf)).grid(
                             column=column,row=row)
