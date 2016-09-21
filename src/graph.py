@@ -5,6 +5,11 @@ from tkinter import font
 import logging
 from src.standard_calc import parse_line
 
+def float_range(low,high,increment=1):
+    y = low
+    while high >= y:
+        y += increment
+        yield y
 
 class App:
     def __init__(self, master):
@@ -62,16 +67,18 @@ class App:
         self.canvas.delete("line")
         equation = self.equation_box.get()
         cords = []
-        for x in np.arange(self.min_x,self.max_x,0.5):
-            #Since co-ordinates are measured from top left, offset all
-            #points by -200,-200
-            try:
-                cords.append((x+self.width/2,
-                    -1*(parse_line(equation,x=x))+self.height/2))
-            except ZeroDivisionError:
-                self.equation_box.delete(0,'end')
-                return False
-        
+        #If equation is linear, ie no powers then plot with interval
+        #of 1, if not then plot at interval of 0.5
+        if "^" not in equation:
+            plotInterval = 1
+        else:
+            plotInterval = 0.5
+
+        for x in float_range(self.min_x,self.max_x,plotInterval):
+            cords.append((
+                x+self.width/2,
+                -1*(parse_line(equation,x=x)-self.height/2)
+                ))
         print(cords) 
         self.canvas.create_line(cords,tags="line")
         
