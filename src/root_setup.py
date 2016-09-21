@@ -25,9 +25,10 @@ def setup(mode="standard"):
             lambda: graph.set_plot_interval(0.25))
         plot_interval_bar.add_command(label="0.1",command=
             lambda: graph.set_plot_interval(0.1))
+        plot_interval_bar.add_command(label="0.05",command=
+            lambda: graph.set_plot_interval(0.05))
         menu_bar.add_cascade(label="Plot Interval", menu=plot_interval_bar)
         graph.App(root)
 
     root.config(menu=menu_bar)
     root.mainloop()
-
