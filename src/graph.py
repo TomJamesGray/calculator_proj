@@ -10,8 +10,8 @@ float_plot_interval = 0.25
 def float_range(low,high,increment=1):
     y = low
     while high >= y:
-        y += round(increment,2)
         yield y
+        y += round(increment,2)
 
 
 def set_plot_interval(x=0.25):
@@ -79,11 +79,13 @@ class App:
         #If equation is linear, ie no powers then plot with interval
         #of 1, if not then plot at interval of 0.5
         if "^" not in equation:
+            logging.info("Using plot_interval of 1")
             plot_interval = 1
         else:
+            logging.info("Using plot_interval of {}".format(float_plot_interval))
             plot_interval = float_plot_interval
 
-        for x in float_range(self.min_x,self.max_x,float_plot_interval):
+        for x in float_range(self.min_x,self.max_x,plot_interval):
             cords.append((
                 x+self.width/2,
                 -1*(parse_line(equation,x=x)-self.height/2)
