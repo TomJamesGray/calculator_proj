@@ -5,19 +5,27 @@ from tkinter import font
 import logging
 from src.standard_calc import parse_line
 
+float_plot_interval = 0.25
+
 def float_range(low,high,increment=1):
     y = low
     while high >= y:
-        y += increment
+        y += round(increment,2)
         yield y
+
+
+def set_plot_interval(x=0.25):
+    global float_plot_interval
+    float_plot_interval = x
+    return x
 
 class App:
     def __init__(self, master):
-        global width,height
+        global width,height,float_plot_interval
 
         self.width, self.height = 600,600
-        self.min_x,self.max_x = -20,20
-        self.min_y,self.max_y = -20,20
+        self.min_x,self.max_x = -10,10
+        self.min_y,self.max_y = -10,10
 
         self.sf = self.width/(abs(self.min_x)+abs(self.max_x))
 
@@ -26,7 +34,8 @@ class App:
         self.equation_box = tk.Entry(self.f,font=font.Font(size=16))
         self.equation_box.grid(column=0,row=0)
         
-        tk.Button(self.f,command=lambda: self.graph_it()).grid(column=0,row=1)
+        tk.Button(self.f,text="Graph it",
+                command=lambda: self.graph_it()).grid(column=0,row=1)
         
         self.canvas = tk.Canvas(self.f,width=self.width,height=self.height,
                 bg="#FFFFFF")
@@ -72,9 +81,9 @@ class App:
         if "^" not in equation:
             plot_interval = 1
         else:
-            plot_interval = 0.25
+            plot_interval = float_plot_interval
 
-        for x in float_range(self.min_x,self.max_x,plot_interval):
+        for x in float_range(self.min_x,self.max_x,float_plot_interval):
             cords.append((
                 x+self.width/2,
                 -1*(parse_line(equation,x=x)-self.height/2)
