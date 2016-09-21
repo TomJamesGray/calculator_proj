@@ -5,7 +5,6 @@ def setup(mode="standard"):
     """Create root level window, returning a frame
     """
     root = tk.Tk()
-    root.config(bg='#282828')
     #Make top level menubar
     menu_bar = tk.Menu(root)
     mode_bar = tk.Menu(menu_bar,tearoff=0)

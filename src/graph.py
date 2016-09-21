@@ -72,7 +72,7 @@ class App:
         if "^" not in equation:
             plot_interval = 1
         else:
-            plot_interval = 0.5
+            plot_interval = 0.25
 
         for x in float_range(self.min_x,self.max_x,plot_interval):
             cords.append((
