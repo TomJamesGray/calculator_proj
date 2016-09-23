@@ -1,34 +1,27 @@
-import numpy as np
 import tkinter as tk
 #Don't know why the font isn't imported with the above import
 from tkinter import font
 import logging
 from src.standard_calc import parse_line
 
-float_plot_interval = 0.25
-
 def float_range(low,high,increment=1):
+    """similar to the builtin range function, but this 
+    has support for a decimal increment value
+    """
     y = low
     while high >= y:
         yield y
         y += round(increment,2)
 
-
-def set_plot_interval(x=0.25):
-    global float_plot_interval
-    float_plot_interval = x
-    return x
-
 class App:
     def __init__(self, master):
-        global width,height,float_plot_interval
-
         self.width, self.height = 600,600
         self.min_x,self.max_x = -10,10
         self.min_y,self.max_y = -10,10
 
         self.sf = self.width/(abs(self.min_x)+abs(self.max_x))
-
+        self.float_plot_interval = 0.25
+        
         logging.info("Starting graphing mode")
         self.f = tk.Frame(master)
         self.equation_box = tk.Entry(self.f,font=font.Font(size=16))
@@ -68,10 +61,15 @@ class App:
             self.sf,self.sf)
         self.f.pack()
 
+    def set_plot_interval(self,interval):
+        """Sets the plot interval used for non-linear functions
+        """
+        self.float_plot_interval = interval
+        logging.info("Plot interval {}".format(interval))
+    
     def graph_it(self):
         """Create a graph from the contents of the equation box 
-        replacing x with the current x value, this is done from 
-        -40<x<40 and -40<y<40
+        replacing x with the current x value
         """
         self.canvas.delete("line")
         equation = self.equation_box.get()
@@ -85,12 +83,13 @@ class App:
             logging.info("Using plot_interval of {}".format(float_plot_interval))
             plot_interval = float_plot_interval
 
-        for x in float_range(self.min_x,self.max_x,plot_interval):
+        for x in float_range(self.min_x,self.max_x,self.float_plot_interval):
             cords.append((
                 round(x+self.width/2,2),
                 round(-1*(parse_line(equation,x=x)-self.height/2),2)
                 ))
-        print(cords) 
+        logging.info("Coordinates: {}".format(cords)) 
         self.canvas.create_line(cords,tags="line")
         
         self.canvas.scale("line",self.width/2,self.height/2,self.sf,self.sf)
+
