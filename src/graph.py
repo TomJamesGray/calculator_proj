@@ -87,8 +87,8 @@ class App:
 
         for x in float_range(self.min_x,self.max_x,plot_interval):
             cords.append((
-                x+self.width/2,
-                -1*(parse_line(equation,x=x)-self.height/2)
+                round(x+self.width/2,2),
+                round(-1*(parse_line(equation,x=x)-self.height/2),2)
                 ))
         print(cords) 
         self.canvas.create_line(cords,tags="line")
