@@ -57,6 +57,18 @@ class App:
                 self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.SW,
                     text=str(-1*y),tags=("y-axis","label"))
         
+        #Show gridlin=`=jedi=0, es for every u
+        grid_lines_every = 1
+        for x in range(self.min_x,self.max_x+1,grid_lines_every):
+            self.canvas.create_line([(x+self.width/2,0),
+                (x+self.width/2,self.height)],tags="grid_line",fill="#DADADA")
+
+        for y in range(self.min_y,self.max_y+1,grid_lines_every):
+            self.canvas.create_line([(0,y+self.height/2),
+                (self.width,y+self.height/2)],tags="grid_line",fill="#DADADA")
+
+        self.canvas.scale("grid_line",self.width/2,self.height/2,
+            self.sf,self.sf)
         self.canvas.scale("label",self.width/2,self.height/2,
             self.sf,self.sf)
         self.f.pack()
