@@ -39,6 +39,18 @@ class App:
         self.canvas.create_line(self.width/2,0,self.width/2,self.height,fill="#AAAAAA",tags="y-axis",
                 width=2)
 
+        #Show gridlines every 1 unit
+        grid_lines_every = 1
+        for x in range(self.min_x,self.max_x+1,grid_lines_every):
+            if x != 0:
+                self.canvas.create_line([(x+self.width/2,0),
+                    (x+self.width/2,self.height)],tags="grid_line",fill="#DADADA")
+
+        for y in range(self.min_y,self.max_y+1,grid_lines_every):
+            if y != 0:
+                self.canvas.create_line([(0,y+self.height/2),
+                    (self.width,y+self.height/2)],tags="grid_line",fill="#DADADA")
+        
         #Show intervals every 5 units, add 1 to max_x, so it's
         #included in the loop
         for x in range(self.min_x,self.max_x+1,5):
@@ -56,20 +68,10 @@ class App:
             else:
                 self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.SW,
                     text=str(-1*y),tags=("y-axis","label"))
-        
-        #Show gridlines every 1 unit
-        grid_lines_every = 1
-        for x in range(self.min_x,self.max_x+1,grid_lines_every):
-            self.canvas.create_line([(x+self.width/2,0),
-                (x+self.width/2,self.height)],tags="grid_line",fill="#DADADA")
 
-        for y in range(self.min_y,self.max_y+1,grid_lines_every):
-            self.canvas.create_line([(0,y+self.height/2),
-                (self.width,y+self.height/2)],tags="grid_line",fill="#DADADA")
-
-        self.canvas.scale("grid_line",self.width/2,self.height/2,
-            self.sf,self.sf)
         self.canvas.scale("label",self.width/2,self.height/2,
+            self.sf,self.sf)
+        self.canvas.scale("grid_line",self.width/2,self.height/2,
             self.sf,self.sf)
         self.f.pack()
 
