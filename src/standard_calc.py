@@ -9,6 +9,12 @@ from functools import partial
 logging.basicConfig(level=logging.DEBUG)
 
 max_precision_out = 5
+special_functions = [
+    ('sin', lambda x: math.sin(math.radians(x))),
+    ('cos', lambda x: math.cos(math.radians(x))),
+    ('tan', lambda x: math.tan(math.radians(x)))
+]
+
 def nested_in(tuple_list,search_for,i=0):
     """
     Look in list of tuples for string at a specific index(default 0)
@@ -27,11 +33,7 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
     prev_ans is also set, however in case of an error such as division
     by 0 the previous answer defaults to 0
     """
-    special_functions = [
-        ('sin', lambda x: math.sin(math.radians(x))),
-        ('cos', lambda x: math.cos(math.radians(x))),
-        ('tan', lambda x: math.tan(math.radians(x)))
-    ]
+    global special_functions
     def parse_special_func(arg_list):
         """Handle the use of special_functions recursively
         """

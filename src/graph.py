@@ -2,7 +2,7 @@ import tkinter as tk
 #Don't know why the font isn't imported with the above import
 from tkinter import font
 import logging
-from src.standard_calc import parse_line
+from src.standard_calc import parse_line,special_functions,nested_in
 
 def float_range(low,high,increment=1):
     """similar to the builtin range function, but this 
@@ -57,7 +57,7 @@ class App:
                 self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.SW,
                     text=str(-1*y),tags=("y-axis","label"))
         
-        #Show gridlin=`=jedi=0, es for every u
+        #Show gridlines every 1 unit
         grid_lines_every = 1
         for x in range(self.min_x,self.max_x+1,grid_lines_every):
             self.canvas.create_line([(x+self.width/2,0),
@@ -88,7 +88,7 @@ class App:
         cords = []
         #If equation is linear, ie no powers then plot with interval
         #of 1, if not then plot at interval of 0.5
-        if "^" not in equation:
+        if "^" not in equation or not nested_in(special_functions,equation):
             logging.info("plot interval: {}".format(1))
             plot_interval = 1
         else:
