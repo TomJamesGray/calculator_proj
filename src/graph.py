@@ -2,7 +2,7 @@ import tkinter as tk
 #Don't know why the font isn't imported with the above import
 from tkinter import font
 import logging
-from src.standard_calc import parse_line,special_functions,nested_in
+from src.standard_calc import parse_line,special_functions,nested_contains
 
 def float_range(low,high,increment=1):
     """similar to the builtin range function, but this 
@@ -88,12 +88,14 @@ class App:
         cords = []
         #If equation is linear, ie no powers then plot with interval
         #of 1, if not then plot at interval of 0.5
-        if "^" not in equation or not nested_in(special_functions,equation):
-            logging.info("plot interval: {}".format(1))
-            plot_interval = 1
-        else:
-            logging.info("plot interval: {}".format(self.float_plot_interval))
+        logging.info("equation: {}".format(equation))
+        print(nested_contains(special_functions,equation))
+        
+        if "^" in equation or nested_contains(special_functions,equation):
             plot_interval = self.float_plot_interval
+        else:
+            plot_interval = 1
+        logging.info("Plot interval: {}".format(plot_interval))
 
         for x in float_range(self.min_x,self.max_x,plot_interval):
             cords.append((

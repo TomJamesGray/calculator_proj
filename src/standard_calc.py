@@ -25,6 +25,12 @@ def nested_in(tuple_list,search_for,i=0):
             return t
     return False
 
+def nested_contains(tuple_list,lookup,i=0):
+    for t in tuple_list:
+        if t[0] in lookup:
+            return True
+
+    return False
 
 def parse_line(calc_line,prev_ans=None,**kwargs):
     """
