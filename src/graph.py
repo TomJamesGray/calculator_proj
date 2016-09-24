@@ -77,13 +77,13 @@ class App:
         #If equation is linear, ie no powers then plot with interval
         #of 1, if not then plot at interval of 0.5
         if "^" not in equation:
-            logging.info("Using plot_interval of 1")
+            logging.info("plot interval: {}".format(1))
             plot_interval = 1
         else:
-            logging.info("Using plot_interval of {}".format(float_plot_interval))
-            plot_interval = float_plot_interval
+            logging.info("plot interval: {}".format(self.float_plot_interval))
+            plot_interval = self.float_plot_interval
 
-        for x in float_range(self.min_x,self.max_x,self.float_plot_interval):
+        for x in float_range(self.min_x,self.max_x,plot_interval):
             cords.append((
                 round(x+self.width/2,2),
                 round(-1*(parse_line(equation,x=x)-self.height/2),2)
