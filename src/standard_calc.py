@@ -27,7 +27,7 @@ def nested_in(tuple_list,search_for,i=0):
 
 def nested_contains(tuple_list,lookup,i=0):
     for t in tuple_list:
-        if t[0] in lookup:
+        if t[i] in lookup:
             return True
 
     return False
