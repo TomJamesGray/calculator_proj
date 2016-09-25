@@ -6,7 +6,6 @@ import types
 import re
 import math
 from functools import partial
-logging.basicConfig(level=logging.DEBUG)
 
 max_precision_out = 5
 special_functions = [

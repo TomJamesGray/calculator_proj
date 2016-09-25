@@ -1,6 +1,8 @@
 import tkinter as tk
+import logging
 from src import standard_calc, graph
 
+logging.basicConfig(level=logging.ERROR)
 def setup(mode="standard"):
     """Create root level window, returning a frame
     """
