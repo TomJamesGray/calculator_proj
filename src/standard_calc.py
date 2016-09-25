@@ -127,8 +127,8 @@ class App:
         #Define buttons and their functions/strings to be implemented
         #on press
         buttons = [
-            ('1/x','1/ANS'),
-            ('+/-','-1*ANS'),
+            ('1/x',('1/ANS', lambda: self.handle_parse_line())),
+            ('+/-',('-1*ANS', lambda: self.handle_parse_line())),
             ('√','sqrt('),
             ('π','π'),
             ('e','e'),#
@@ -203,20 +203,27 @@ class App:
         function if the button is assigned to a function or class method
         or append the string or int to the calculator screen.
         """
-
-        if isinstance(buttonFunction, types.MethodType) or \
-            isinstance(buttonFunction, types.FunctionType):
-            buttonFunction()
+        def handle_individual_func(buttonFunction):
+            if isinstance(buttonFunction, types.MethodType) or \
+                isinstance(buttonFunction, types.FunctionType):
+                buttonFunction()
+            else:
+                #Only clear_on_next_button if the button isn't a function
+                #this means the ANS can be incremented just by pressing '='
+                if self.clear_on_next_button:
+                    #Clear calc_screen
+                    self.calc_screen.delete(0,'end')
+                    #Reset clear_on_next_button now
+                    self.clear_on_next_button = False
+                
+                self.calc_screen.insert(tk.END,buttonFunction)
+        
+        if isinstance(buttonFunction,tuple):
+            for f in buttonFunction:
+                handle_individual_func(f)
         else:
-            #Only clear_on_next_button if the button isn't a function
-            #this means the ANS can be incremented just by pressing '='
-            if self.clear_on_next_button:
-                #Clear calc_screen
-                self.calc_screen.delete(0,'end')
-                #Reset clear_on_next_button now
-                self.clear_on_next_button = False
-            
-            self.calc_screen.insert(tk.END,buttonFunction)
+            handle_individual_func(buttonFunction)
+
 
     def handle_parse_line(self):
         """Call parse_line, but set class specific attributes
