@@ -214,9 +214,18 @@ class App:
     def handle_parse_line(self):
         """Call parse_line, but set class specific attributes
         """
-        self.prev_ans = self.calc_answer_screen['text']
-        self.calc_answer_screen['text'] = round(
+        if self.prev_ans != None:
+            self.prev_ans = self.calc_answer_screen['text']
+        try:
+            ans = round(
                 parse_line(self.calc_screen.get(),self.prev_ans),max_precision_out)
+            self.prev_ans = ans
+        except Exception as e:
+            logging.error(e)
+            ans = "Error"
+            self.prev_ans = None
+
+        self.calc_answer_screen['text'] = ans
         self.clear_on_next_button = True
         
 
