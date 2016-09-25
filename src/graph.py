@@ -91,7 +91,6 @@ class App:
         #If equation is linear, ie no powers then plot with interval
         #of 1, if not then plot at interval of 0.5
         logging.info("equation: {}".format(equation))
-        print(nested_contains(special_functions,equation))
         
         if "^" in equation or nested_contains(special_functions,equation):
             plot_interval = self.float_plot_interval
@@ -100,10 +99,14 @@ class App:
         logging.info("Plot interval: {}".format(plot_interval))
 
         for x in float_range(self.min_x,self.max_x,plot_interval):
-            cords.append((
-                round(x+self.width/2,2),
-                round(-1*(parse_line(equation,x=x)-self.height/2),2)
+            try:
+                cords.append((
+                    round(x+self.width/2,2),
+                    round(-1*(parse_line(equation,x=x)-self.height/2),2)
                 ))
+            except Exception as e:
+                logging.error("Error: {} \nRaised at x val: {}".format(e,x))
+
         logging.info("Coordinates: {}".format(cords)) 
         self.canvas.create_line(cords,tags="line")
         
