@@ -11,7 +11,8 @@ max_precision_out = 5
 special_functions = [
     ('sin', lambda x: math.sin(math.radians(x))),
     ('cos', lambda x: math.cos(math.radians(x))),
-    ('tan', lambda x: math.tan(math.radians(x)))
+    ('tan', lambda x: math.tan(math.radians(x))),
+    ('sqrt',lambda x: math.sqrt(x))
 ]
 
 def nested_in(tuple_list,search_for,i=0):
@@ -124,26 +125,31 @@ class App:
         #Define buttons and their functions/strings to be implemented
         #on press
         buttons = [
+            ('1/x','1/'),
+            ('+/-','+/-'),
+            ('√','sqrt('),
+            ('π','π'),
+            ('e','e'),#
             ('sin','sin('),
             ('cos','cos('),
             ('tan','tan('),
             ('^','**'),
-            ('C',self.clear_line),
+            ('C',self.clear_line),#
             ('7',7),
             ('8',8),
             ('9',9),
             ('(','('),
-            (')',')'),
+            (')',')'),#
             ('4',4),
             ('5',5),
             ('6',6),
             ('x','*'),
-            ('/','/'),
+            ('/','/'),#
             ('1',1),
             ('2',2),
             ('3',3),
             ('+','+'),
-            ('-','-'),
+            ('-','-'),#
             ('0',0),
             ('.','.'),
             ('x10','*10'),
