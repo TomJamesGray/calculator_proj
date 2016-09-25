@@ -135,7 +135,7 @@ class App:
             ('sin','sin('),
             ('cos','cos('),
             ('tan','tan('),
-            ('^','**'),
+            ('^','^'),
             ('C',self.clear_line),#
             ('7',7),
             ('8',8),
