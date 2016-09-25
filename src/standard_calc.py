@@ -65,6 +65,8 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
 
     #Replace "ANS" with the prev_ans
     calc_line = calc_line.replace("ANS",str(prev_ans))
+    #Replace π with 3.14...
+    calc_line = calc_line.replace("π",str(math.pi))
     #Replace kwargs name with the value
     for name, value in kwargs.items():
         calc_line = calc_line.replace(name,str(value))
@@ -125,8 +127,8 @@ class App:
         #Define buttons and their functions/strings to be implemented
         #on press
         buttons = [
-            ('1/x','1/'),
-            ('+/-','+/-'),
+            ('1/x','1/ANS'),
+            ('+/-','-1*ANS'),
             ('√','sqrt('),
             ('π','π'),
             ('e','e'),#
