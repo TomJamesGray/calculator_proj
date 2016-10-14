@@ -2,12 +2,13 @@ import tkinter as tk
 import logging
 from src import standard_calc, graph
 
+#Set error level
+#Set to ERROR for production
 logging.basicConfig(level=logging.ERROR)
+
 def setup(mode="standard"):
-    """Create root level window, returning a frame
-    """
     root = tk.Tk()
-    #Make top level menubar
+    #Make top level menubar, common for all windows
     menu_bar = tk.Menu(root)
     mode_bar = tk.Menu(menu_bar,tearoff=0)
     mode_bar.add_command(label="Standard",command=
@@ -21,6 +22,7 @@ def setup(mode="standard"):
         standard_calc.App(root)
     elif mode == "graph":
         app = graph.App(root)
+        #Add menu for plot interval specific for the graph menu
         plot_interval_bar = tk.Menu(menu_bar,tearoff=0)
         plot_interval_bar.add_command(label="0.5",command=
             lambda: app.set_plot_interval(0.5))

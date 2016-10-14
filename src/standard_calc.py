@@ -8,6 +8,8 @@ import math
 from functools import partial
 
 max_precision_out = 5
+#Define the special functions with lambdas
+#and convert from degrees to radians
 special_functions = [
     ('sin', lambda x: math.sin(math.radians(x))),
     ('cos', lambda x: math.cos(math.radians(x))),
@@ -97,7 +99,6 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
                 #another opening bracket
                 elif elem == ")" and closingsToIgnore > 0:
                     closingsToIgnore -= 1
-                    #TODO don't need closing bracket if it's last
                 elif elem == ")" and closingsToIgnore == 0:
                     parsed_calc_line.append(parse_special_func(split_calc_line[i:i+j]))
                     #Add j to i, so that any other nested sin's don't get 

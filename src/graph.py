@@ -15,6 +15,9 @@ def float_range(low,high,increment=1):
 
 class App:
     def __init__(self, master):
+        """ Initialise basic graph attributes and draw
+        grid lines
+        """
         self.width, self.height = 600,600
         self.min_x,self.max_x = -10,10
         self.min_y,self.max_y = -10,10
@@ -22,14 +25,17 @@ class App:
         self.sf = self.width/(abs(self.min_x)+abs(self.max_x))
         self.float_plot_interval = 0.25
         
+        #Create equation box and set fonts
         logging.info("Starting graphing mode")
         self.f = tk.Frame(master)
         self.equation_box = tk.Entry(self.f,font=font.Font(size=16))
         self.equation_box.grid(column=0,row=0)
         
+        #Create button to draw the graph
         tk.Button(self.f,text="Graph it",
                 command=lambda: self.graph_it()).grid(column=0,row=1)
         
+        #Initialise graph canvas
         self.canvas = tk.Canvas(self.f,width=self.width,height=self.height,
                 bg="#FFFFFF")
         self.canvas.grid(column=1,row=0)
@@ -101,14 +107,17 @@ class App:
         for x in float_range(self.min_x,self.max_x,plot_interval):
             try:
                 cords.append((
-                    round(x+self.width/2,2),
+                    round(x+self.width/2,2),#add half of width to center the origin
                     round(-1*(parse_line(equation,x=x)-self.height/2),2)
                 ))
+                #Invert the origin for y so -ve values are in bottom half and center
+                #the origin by taking away half the height
             except Exception as e:
+                #Catch errors and don't plot the values but don't crash
                 logging.error("Error: {} \nRaised at x val: {}".format(e,x))
 
         logging.info("Coordinates: {}".format(cords)) 
         self.canvas.create_line(cords,tags="line")
-        
+        #Scale the line so it takes up all of the graph 
         self.canvas.scale("line",self.width/2,self.height/2,self.sf,self.sf)
 
