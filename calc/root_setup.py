@@ -1,10 +1,34 @@
 import tkinter as tk
 import logging
+import logging.config
 from calc import standard_calc, graph
 
-#Set error level
-#Set to ERROR for production
-logging.basicConfig(level=logging.ERROR)
+logging_config = {
+    "version":1,
+    "formatters":{
+        "main":{"format":"%(name)s-%(lineno)d: %(message)s"}
+    },
+    "handlers":{
+        "calculations":{
+            "class":"logging.StreamHandler",
+            "formatter":"main",
+            "level":"DEBUG"},
+        "gui":{
+            "class":"logging.StreamHandler",
+            "formatter":"main",
+            "level":"ERROR"}
+    },
+    "loggers":{
+        "calc.calculations":{
+            "handlers":["calculations"],
+            "level":"DEBUG"},
+        "calc":{
+            "handlers":["gui"],
+            "level":"ERROR"}
+    }
+}
+
+logging.config.dictConfig(logging_config)
 
 def setup(mode="standard"):
     root = tk.Tk()

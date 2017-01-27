@@ -9,7 +9,7 @@ from functools import partial
 from calc import calculations
 
 max_precision_out = 5
-
+logger = logging.getLogger(__name__)
 class App:
     global max_precision_out
     def __init__(self, master, columns=5):
@@ -77,10 +77,10 @@ class App:
                     command=partial(self.button_handler,button_inf)).grid(
                             column=column,row=row)
             
-            logging.info("Button: {} at row {} col {}".format(button,row,column))
+            logger.info("Button: {} at row {} col {}".format(button,row,column))
             #Create a new row if needed
             if column == columns - 1:
-                logging.info("Creating new row at: {}".format(button))
+                logger.info("Creating new row at: {}".format(button))
                 row += 1
                 column = 0
             else:
@@ -124,7 +124,7 @@ class App:
                     self.calc_screen.get(),self.prev_ans),max_precision_out)
             self.prev_ans = ans
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             ans = "Error"
             self.prev_ans = None
 
