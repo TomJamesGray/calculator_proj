@@ -2,7 +2,8 @@ import tkinter as tk
 #Don't know why the font isn't imported with the above import
 from tkinter import font
 import logging
-from src.standard_calc import parse_line,special_functions,nested_contains
+from calc.calculations import parse_line,special_functions
+from calc.helpers import nested_contains
 
 def float_range(low,high,increment=1):
     """similar to the builtin range function, but this 

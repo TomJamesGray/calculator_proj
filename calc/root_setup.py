@@ -1,6 +1,6 @@
 import tkinter as tk
 import logging
-from src import standard_calc, graph
+from calc import standard_calc, graph
 
 #Set error level
 #Set to ERROR for production
