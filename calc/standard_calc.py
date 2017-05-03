@@ -3,6 +3,10 @@ import tkinter as tk
 from tkinter import font
 import logging
 import types
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 import re
 import math
 from functools import partial
@@ -10,9 +14,11 @@ from calc import calculations
 
 max_precision_out = 5
 logger = logging.getLogger(__name__)
-class App:
+
+class Calculator(Widget):
     global max_precision_out
-    def __init__(self, master, columns=5):
+    def __init__(self, columns=5,**kwargs):
+        super(Calculator,self).__init__(**kwargs)
         #Define buttons and their functions/strings to be implemented
         #on press
         buttons = [
@@ -51,41 +57,14 @@ class App:
         self.clear_on_next_button = False
         self.prev_ans = None
         
-        # Make frame, child of master
-        f = tk.Frame(master)
-        #Initialize grid to 40px wide columns
-        for column in range(columns):
-            f.columnconfigure(column)
+        container = Widget()
+        grid = GridLayout(size=(500,500),pos=(250,0))
+        for button in buttons:
+            grid.add_widget(Button(text=button[0]))
 
-        #Create entry box to display the sum for the calculator, the sticky
-        #option streches the textbox horizontally to use up all the space available
-        self.calc_screen = tk.Entry(f,font=font.Font(size=16,family="Arial"))
-        self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
+        container.add_widget(grid)
+        self.add_widget(container)
 
-        self.calc_answer_screen = tk.Label(f,justify='left')
-        self.calc_answer_screen.grid(column=0,row=1,columnspan=columns,
-                sticky=tk.E+tk.W)
-        #Initialise variables for loop for button grid
-        row, column = 2, 0
-        
-        # Loop through buttons and create button
-        # with the command which will then be appended to the
-        # "command line", with the exception of functions
-        for button,button_inf in buttons:
-            tk.Button(f,text=button,width=3,
-                    relief=tk.GROOVE,overrelief=tk.GROOVE,
-                    command=partial(self.button_handler,button_inf)).grid(
-                            column=column,row=row)
-            
-            logger.info("Button: {} at row {} col {}".format(button,row,column))
-            #Create a new row if needed
-            if column == columns - 1:
-                logger.info("Creating new row at: {}".format(button))
-                row += 1
-                column = 0
-            else:
-                column += 1
-        f.pack() 
     def button_handler(self,buttonFunction):
         """
         Handles all button presses and either runs the
@@ -135,3 +114,11 @@ class App:
     def clear_line(self):
         self.calc_screen.delete(0,'end')
 
+class CalculatorApp(App):
+    def build(self):
+        self.title = "Calculator"
+        calc = Calculator()
+        return calc
+
+def main():
+    CalculatorApp().run()
