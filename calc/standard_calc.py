@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-import tkinter as tk
-from tkinter import font
 import logging
 import types
+from kivy.config import Config
+Config.set('graphics','resizable',0)
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from kivy.core.window import Window
 import re
 import math
 from functools import partial
@@ -58,7 +60,7 @@ class Calculator(Widget):
         self.prev_ans = None
         
         container = Widget()
-        grid = GridLayout(size=(500,500),pos=(250,0))
+        grid = GridLayout(size=(400,300),pos=(0,0),rows=6,cols=5)
         for button in buttons:
             grid.add_widget(Button(text=button[0]))
 
@@ -117,6 +119,7 @@ class Calculator(Widget):
 class CalculatorApp(App):
     def build(self):
         self.title = "Calculator"
+        Window.size=(400,500)
         calc = Calculator()
         return calc
 
