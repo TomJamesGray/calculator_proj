@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
+from kivy.properties import ObjectProperty
 import re
 import math
 from functools import partial
@@ -19,11 +20,12 @@ logger = logging.getLogger(__name__)
 
 class Calculator(Widget):
     global max_precision_out
+    screen = ObjectProperty(None)
     def __init__(self, columns=5,**kwargs):
         super(Calculator,self).__init__(**kwargs)
         #Define buttons and their functions/strings to be implemented
         #on press
-        buttons = [
+        self.buttons = [
             ('1/x',('1/ANS', lambda: self.handle_parse_line())),
             ('+/-',('-1*ANS', lambda: self.handle_parse_line())),
             ('√','sqrt('),
@@ -61,65 +63,70 @@ class Calculator(Widget):
         
         container = Widget()
         grid = GridLayout(size=(400,300),pos=(0,0),rows=6,cols=5)
-        for button in buttons:
-            grid.add_widget(Button(text=button[0]))
+        for i,button in enumerate(self.buttons):
+            grid.add_widget(Button(text=button[0],on_press=self.button_handler,id=str(i)))
 
         container.add_widget(grid)
         self.add_widget(container)
 
-    def button_handler(self,buttonFunction):
+    def button_handler(self,button_instance):
         """
         Handles all button presses and either runs the
         function if the button is assigned to a function or class method
         or append the string or int to the calculator screen.
         """
-        def handle_individual_func(buttonFunction):
-            if isinstance(buttonFunction, types.MethodType) or \
-                isinstance(buttonFunction, types.FunctionType):
-                buttonFunction()
+        button_function = self.buttons[int(button_instance.id)][1]
+        # print(buttonFunction())
+        def handle_individual_func(button_function):
+            if isinstance(button_function, types.MethodType) or \
+                isinstance(button_function, types.FunctionType):
+                button_function()
             else:
                 #Only clear_on_next_button if the button isn't a function
                 #this means the ANS can be incremented just by pressing '='
                 if self.clear_on_next_button:
                     #Clear calc_screen
-                    self.calc_screen.delete(0,'end')
+                    self.screen.text = ""
                     #Reset clear_on_next_button now
                     self.clear_on_next_button = False
                 
-                self.calc_screen.insert(tk.END,buttonFunction)
+
+                print("Button {} pressed".format(button_function))
+                print(self.screen)
+                self.screen.insert_text(str(button_function))
         
-        if isinstance(buttonFunction,tuple):
-            for f in buttonFunction:
+        if isinstance(button_function,tuple):
+            for f in button_function:
                 handle_individual_func(f)
         else:
-            handle_individual_func(buttonFunction)
+            handle_individual_func(button_function)
 
 
     def handle_parse_line(self):
         """Call parse_line, but set class specific attributes
         """
         if self.prev_ans != None:
-            self.prev_ans = self.calc_answer_screen['text']
+            self.prev_ans = self.screen.text
         try:
             ans = round(calculations.parse_line(
-                    self.calc_screen.get(),self.prev_ans),max_precision_out)
+                    self.screen.text,self.prev_ans),max_precision_out)
             self.prev_ans = ans
         except Exception as e:
             logger.error(e)
             ans = "Error"
             self.prev_ans = None
 
-        self.calc_answer_screen['text'] = ans
+        self.screen.text= str(ans)
         self.clear_on_next_button = True
         
 
     def clear_line(self):
-        self.calc_screen.delete(0,'end')
+        self.screen.text = ""
 
 class CalculatorApp(App):
     def build(self):
         self.title = "Calculator"
-        Window.size=(400,500)
+        Window.size=(400,400)
         calc = Calculator()
         return calc
 
