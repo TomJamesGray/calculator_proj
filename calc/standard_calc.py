@@ -141,8 +141,8 @@ class GraphingCalc(Widget):
         self.x_max = 6
         self.x_min = -6
         self.x_step = 1
-        self.y_max = 2
-        self.y_min = -2
+        self.y_max = 6
+        self.y_min = -6
         self.y_step = 1
         self.graph_width = 400
         self.graph_height = 410
