@@ -28,6 +28,7 @@
         font_size:25
 
 <GraphingCalc>
+    function_input:function_input
     ActionBar:
         width:root.width
         size_hint_x:1
@@ -55,5 +56,9 @@
         cols_minimum:{0:50,1:150}
         Label:
             text:"f(x) = "
-        TextInput
+        TextInput:
+            id:function_input
+        Button:
+            text:"Plot"
+            on_press:root.graph_it()
 

@@ -135,6 +135,7 @@ class Calculator(Widget):
         self.screen.text = ""
 
 class GraphingCalc(Widget):
+    function_input = ObjectProperty(None)
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.x_max = 6
@@ -188,19 +189,6 @@ class GraphingCalc(Widget):
                           color=(0, 0, 0, 1), text=str(x_labels[i])))
 
 
-            # EG Plot x^2
-            prev_x = None
-            prev_y = None
-            for px_x in range(0,self.graph_width):
-                carte_x = self.px_to_carte(px_x,0)[0]
-                carte_y = carte_x**2
-                if prev_x == None:
-                    prev_x = carte_x
-                    prev_y = carte_y
-                else:
-                    Line(points=[*self.carte_to_px(carte_x,carte_y),*self.carte_to_px(prev_x,prev_y)], width=1.05)
-                    prev_x = carte_x
-                    prev_y = carte_y
 
             Translate(xy=self.pos)
 
@@ -233,6 +221,23 @@ class GraphingCalc(Widget):
             Color(*col)
             Rectangle(pos=pos,size=size)
             # Translate(xy=self.pos)
+
+    def graph_it(self):
+        with self.graph.canvas:
+            prev_x = None
+            prev_y = None
+            print(self.function_input.text)
+            for px_x in range(0, self.graph_width):
+                carte_x = self.px_to_carte(px_x, 0)[0]
+                carte_y = calculations.parse_line(self.function_input.text.replace("x",str(carte_x)))
+                if prev_x == None:
+                    prev_x = carte_x
+                    prev_y = carte_y
+                else:
+                    Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.05)
+                    prev_x = carte_x
+                    prev_y = carte_y
+            Translate(xy=self.pos)
 
 class CalculatorApp(App):
     def build(self):
