@@ -141,8 +141,8 @@ class GraphingCalc(Widget):
         self.x_max = 6
         self.x_min = -6
         self.x_step = 1
-        self.y_max = 6
-        self.y_min = -6
+        self.y_max = 2
+        self.y_min = -2
         self.y_step = 1
         self.graph_width = 400
         self.graph_height = 410
@@ -154,22 +154,27 @@ class GraphingCalc(Widget):
         self.add_widget(self.graph)
 
     def initialise_graph(self):
+        """
+        Initialises the graph layout, works if canvas is or isn't already populated. Also resets
+        the axis labels
+        """
         with self.graph.canvas:
             Color(1,1,1,1)
             Rectangle(pos=(0,0),size=self.graph.size)
             Color(0,0,0,1)
             # Major Y axis
             self.generate_axes(self.carte_to_px(0, self.y_min), (1, 410), (0, 0, 0, 1))
+
             # Major X axis
             self.generate_axes(self.carte_to_px(self.x_min, 0), (400, 1), (0, 0, 0, 1))
 
-            # Minor x axes
-            for i in range(self.x_min, self.x_max + self.x_step, self.x_step):
-                self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
-
             # Minor y axes
-            for i in range(self.y_min, self.y_max + self.y_step, self.y_step):
+            for i in range(self.x_min, self.x_max + self.x_step, self.x_step):
                 self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
+
+            # Minor x axes
+            for i in range(self.y_min, self.y_max + self.y_step, self.y_step):
+                self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
 
             # If labels already exist remove them (incase limits have changed)
             if self.x_label_objects != None:
@@ -187,22 +192,21 @@ class GraphingCalc(Widget):
             x_spacing = self.graph_width/len(x_labels)
 
             for i,lbl in enumerate(x_labels):
-                print("Adding label for x={}".format(x_labels[i]))
                 a = Label(pos=self.carte_to_px(x_labels[i],0), font_size="8sp", width=7, height=10,
                           color=(0, 0, 0, 1), text=str(x_labels[i]))
                 self.x_label_objects.append(a)
 
             # Add y labels
             y_labels = list(range(self.y_min, self.y_max + self.y_step, self.y_step))
+            print("Y labels: {}".format(y_labels))
             y_spacing = self.graph_height / len(y_labels)
 
             for i, lbl in enumerate(y_labels):
                 # Don't repeat 0 as already done on x label run
                 if y_labels[i] == 0:
                     continue
-                print("Adding label for y={}".format(y_labels[i]))
                 a = Label(pos=self.carte_to_px(0,y_labels[i]), font_size="8sp", width=7, height=10,
-                          color=(0, 0, 0, 1), text=str(x_labels[i]))
+                          color=(0, 0, 0, 1), text=str(y_labels[i]))
                 self.y_label_objects.append(a)
 
             Translate(xy=self.pos)
@@ -241,7 +245,6 @@ class GraphingCalc(Widget):
             self.initialise_graph()
             prev_x = None
             prev_y = None
-            print(self.function_input.text)
             for px_x in range(0, self.graph_width):
                 carte_x = self.px_to_carte(px_x, 0)[0]
                 carte_y = calculations.parse_line(self.function_input.text.replace("x",str(carte_x)))
