@@ -146,8 +146,14 @@ class GraphingCalc(Widget):
         self.y_step = 1
         self.graph_width = 400
         self.graph_height = 410
+        self.x_label_objects = None
+        self.y_label_objects = None
         self.graph = RelativeLayout(pos=(200,0),width=self.graph_width,height=self.graph_height)
-        # Add graph axes
+
+        self.initialise_graph()
+        self.add_widget(self.graph)
+
+    def initialise_graph(self):
         with self.graph.canvas:
             Color(1,1,1,1)
             Rectangle(pos=(0,0),size=self.graph.size)
@@ -165,15 +171,26 @@ class GraphingCalc(Widget):
             for i in range(self.y_min, self.y_max + self.y_step, self.y_step):
                 self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
 
+            # If labels already exist remove them (incase limits have changed)
+            if self.x_label_objects != None:
+                for lbl in self.x_label_objects:
+                    lbl.clear_widgets()
+
+                for lbl in self.y_label_objects:
+                    lbl.clear_widgets()
+
+            self.x_label_objects = []
+            self.y_label_objects = []
+
             # Add x labels
             x_labels = list(range(self.x_min,self.x_max+self.x_step,self.x_step))
             x_spacing = self.graph_width/len(x_labels)
 
             for i,lbl in enumerate(x_labels):
                 print("Adding label for x={}".format(x_labels[i]))
-                self.add_widget(
-                    Label(pos=self.carte_to_px(x_labels[i],0), font_size="8sp", width=7, height=10,
-                          color=(0, 0, 0, 1), text=str(x_labels[i])))
+                a = Label(pos=self.carte_to_px(x_labels[i],0), font_size="8sp", width=7, height=10,
+                          color=(0, 0, 0, 1), text=str(x_labels[i]))
+                self.x_label_objects.append(a)
 
             # Add y labels
             y_labels = list(range(self.y_min, self.y_max + self.y_step, self.y_step))
@@ -184,15 +201,11 @@ class GraphingCalc(Widget):
                 if y_labels[i] == 0:
                     continue
                 print("Adding label for y={}".format(y_labels[i]))
-                self.add_widget(
-                    Label(pos=self.carte_to_px(0,y_labels[i]), font_size="8sp", width=7, height=10,
-                          color=(0, 0, 0, 1), text=str(x_labels[i])))
-
-
+                a = Label(pos=self.carte_to_px(0,y_labels[i]), font_size="8sp", width=7, height=10,
+                          color=(0, 0, 0, 1), text=str(x_labels[i]))
+                self.y_label_objects.append(a)
 
             Translate(xy=self.pos)
-
-        self.add_widget(self.graph)
 
     def carte_to_px(self,carte_x,carte_y):
         """
@@ -208,7 +221,7 @@ class GraphingCalc(Widget):
     def px_to_carte(self,px_x,px_y):
         """
         Converts a given pixel co-ordinate into the coresponding cartesian co-ordinate
-        :param px_x: X value for co-oridnate
+        :param px_x: X value for co-oridnatea
         :param px_y: Y value for co-ordinate
         :return:
         """
@@ -224,6 +237,8 @@ class GraphingCalc(Widget):
 
     def graph_it(self):
         with self.graph.canvas:
+            # Re-initialise graph
+            self.initialise_graph()
             prev_x = None
             prev_y = None
             print(self.function_input.text)
