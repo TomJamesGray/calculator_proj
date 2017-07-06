@@ -7,10 +7,12 @@ Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
-from kivy.graphics import Rectangle,Color
+from kivy.graphics import Rectangle,Color,Translate
 import re
 import math
 from functools import partial
@@ -135,15 +137,76 @@ class Calculator(Widget):
 class GraphingCalc(Widget):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.graph = Widget(pos=(200,0),width=(400),height=410)
+        self.x_max = 6
+        self.x_min = -6
+        self.x_step = 1
+        self.y_max = 6
+        self.y_min = -6
+        self.y_step = 1
+        self.graph_width = 400
+        self.graph_height = 410
+        self.graph = RelativeLayout(pos=(200,0),width=self.graph_width,height=self.graph_height)
         # Add graph axes
         with self.graph.canvas:
             Color(1,1,1,1)
-            Rectangle(pos=self.graph.pos,size=self.graph.size)
+            Rectangle(pos=(0,0),size=self.graph.size)
             Color(0,0,0,1)
-            Rectangle(pos=(250,10),size=(5,410))
+            # Major Y axis
+            self.generate_axes(self.carte_to_px(0, self.y_min), (1, 410), (0, 0, 0, 1))
+            # Major X axis
+            self.generate_axes(self.carte_to_px(self.x_min, 0), (400, 1), (0, 0, 0, 1))
+
+            # Minor x axes
+            for i in range(self.x_min, self.x_max + self.x_step, self.x_step):
+                self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
+
+            # Minor y axes
+            for i in range(self.y_min, self.y_max + self.y_step, self.y_step):
+                self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
+
+            # Add x labels
+            x_labels = list(range(self.x_min,self.x_max+self.x_step,self.x_step))
+            x_spacing = self.graph_width/len(x_labels)
+
+            for i,lbl in enumerate(x_labels):
+                print("Adding label for x={}".format(x_labels[i]))
+                self.add_widget(
+                    Label(pos=self.carte_to_px(x_labels[i],0), font_size="8sp", width=7, height=10,
+                          color=(0, 0, 0, 1), text=str(x_labels[i])))
+
+            # Add y labels
+            y_labels = list(range(self.y_min, self.y_max + self.y_step, self.y_step))
+            y_spacing = self.graph_height / len(y_labels)
+
+            for i, lbl in enumerate(y_labels):
+                # Don't repeat 0 as already done on x label run
+                if y_labels[i] == 0:
+                    continue
+                print("Adding label for y={}".format(y_labels[i]))
+                self.add_widget(
+                    Label(pos=self.carte_to_px(0,y_labels[i]), font_size="8sp", width=7, height=10,
+                          color=(0, 0, 0, 1), text=str(x_labels[i])))
+
+            Translate(xy=self.pos)
 
         self.add_widget(self.graph)
+
+    def carte_to_px(self,carte_x,carte_y):
+        """
+        Converts a given cartesian co-ordinate for the graph to the pixels for drawing
+        :param carte_x: X value for co-ordinate
+        :param carte_y: Y Value for co-ordinate
+        :return: (X,Y) tuple with co-ordinates in pixels on the graph
+        """
+        dx = carte_x - self.x_min
+        dy = carte_y - self.y_min
+        return (int(dx*self.graph_width/(self.x_max-self.x_min)),int(dy*self.graph_height)/(self.y_max-self.y_min))
+
+    def generate_axes(self,pos,size,col):
+        with self.graph.canvas:
+            Color(*col)
+            Rectangle(pos=pos,size=size)
+            # Translate(xy=self.pos)
 
 class CalculatorApp(App):
     def build(self):
