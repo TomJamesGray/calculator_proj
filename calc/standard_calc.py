@@ -10,6 +10,7 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
+from kivy.graphics import Rectangle,Color
 import re
 import math
 from functools import partial
@@ -132,7 +133,17 @@ class Calculator(Widget):
         self.screen.text = ""
 
 class GraphingCalc(Widget):
-    graph_area = ObjectProperty(None)
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.graph = Widget(pos=(200,0),width=(400),height=410)
+        # Add graph axes
+        with self.graph.canvas:
+            Color(1,1,1,1)
+            Rectangle(pos=self.graph.pos,size=self.graph.size)
+            Color(0,0,0,1)
+            Rectangle(pos=(250,10),size=(5,410))
+
+        self.add_widget(self.graph)
 
 class CalculatorApp(App):
     def build(self):

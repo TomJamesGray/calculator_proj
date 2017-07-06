@@ -28,7 +28,6 @@
         font_size:25
 
 <GraphingCalc>
-    graph_area:graph_area
     ActionBar:
         width:root.width
         size_hint_x:1
@@ -58,14 +57,3 @@
             text:"f(x) = "
         TextInput
 
-    Widget:
-        pos:(200,0)
-        width:400
-        height:root.height-40
-        id:graph_area
-        canvas:
-            Color:
-                rgba:1,1,1,1
-            Rectangle:
-                pos:self.pos
-                size:self.size
