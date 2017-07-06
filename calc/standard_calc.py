@@ -62,7 +62,7 @@ class Calculator(Widget):
         self.prev_ans = None
         
         container = Widget()
-        grid = GridLayout(size=(400,300),pos=(0,0),rows=6,cols=5)
+        grid = GridLayout(size=(350,300),pos=(0,0),rows=6,cols=5)
         for i,button in enumerate(self.buttons):
             grid.add_widget(Button(text=button[0],on_press=self.button_handler,id=str(i)))
 
@@ -119,14 +119,25 @@ class Calculator(Widget):
         self.screen.text= str(ans)
         self.clear_on_next_button = True
         
+    def graph_mode(self):
+        """
+        Switch to the graphing mode
+        :return:
+        """
+        Window.size = (600,450)
+        self.clear_widgets()
+        self.add_widget(GraphingCalc(pos=(0,0),width=600,height=450))
 
     def clear_line(self):
         self.screen.text = ""
 
+class GraphingCalc(Widget):
+    graph_area = ObjectProperty(None)
+
 class CalculatorApp(App):
     def build(self):
         self.title = "Calculator"
-        Window.size=(400,400)
+        Window.size=(350,450)
         calc = Calculator()
         return calc
 

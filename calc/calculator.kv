@@ -1,5 +1,22 @@
 <Calculator>
     screen:screen
+    ActionBar:
+        width:root.width
+        size_hint_x:1
+        height:40
+        pos:0,root.height-self.height
+        ActionView:
+            use_seperator:True
+            ActionPrevious:
+                with_previous:False
+                size_hint_x:None
+                width:0
+                app_icon_width:1
+                app_icon_height:0
+            ActionButton:
+                on_press:root.graph_mode()
+                text:"Graphing Mode"
+
     TextInput:
         id:screen
         multiline:False
@@ -9,3 +26,46 @@
         foreground_color:1,1,1,1
         cursor_color:0.8,0.8,0.8,1
         font_size:25
+
+<GraphingCalc>
+    graph_area:graph_area
+    ActionBar:
+        width:root.width
+        size_hint_x:1
+        height:40
+        pos:0,root.height-self.height
+        ActionView:
+            use_seperator:True
+            ActionPrevious:
+                with_previous:False
+                size_hint_x:None
+                width:0
+                app_icon_width:1
+                app_icon_height:0
+            ActionButton:
+                on_press:root.graph_mode()
+                text:"Standard mode"
+    GridLayout:
+        width:200
+        height:root.height-40
+        padding:0,10
+        pos:0,0
+        cols:2
+        row_default_height:30
+        row_force_default:True
+        cols_minimum:{0:50,1:150}
+        Label:
+            text:"f(x) = "
+        TextInput
+
+    Widget:
+        pos:(200,0)
+        width:400
+        height:root.height-40
+        id:graph_area
+        canvas:
+            Color:
+                rgba:1,1,1,1
+            Rectangle:
+                pos:self.pos
+                size:self.size
