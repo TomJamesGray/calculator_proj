@@ -12,7 +12,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
-from kivy.graphics import Rectangle,Color,Translate
+from kivy.graphics import Rectangle,Color,Translate,Line
 import re
 import math
 from functools import partial
@@ -187,6 +187,21 @@ class GraphingCalc(Widget):
                     Label(pos=self.carte_to_px(0,y_labels[i]), font_size="8sp", width=7, height=10,
                           color=(0, 0, 0, 1), text=str(x_labels[i])))
 
+
+            # EG Plot x^2
+            prev_x = None
+            prev_y = None
+            for px_x in range(0,self.graph_width):
+                carte_x = self.px_to_carte(px_x,0)[0]
+                carte_y = carte_x**2
+                if prev_x == None:
+                    prev_x = carte_x
+                    prev_y = carte_y
+                else:
+                    Line(points=[*self.carte_to_px(carte_x,carte_y),*self.carte_to_px(prev_x,prev_y)], width=1.05)
+                    prev_x = carte_x
+                    prev_y = carte_y
+
             Translate(xy=self.pos)
 
         self.add_widget(self.graph)
@@ -201,6 +216,17 @@ class GraphingCalc(Widget):
         dx = carte_x - self.x_min
         dy = carte_y - self.y_min
         return (int(dx*self.graph_width/(self.x_max-self.x_min)),int(dy*self.graph_height)/(self.y_max-self.y_min))
+
+    def px_to_carte(self,px_x,px_y):
+        """
+        Converts a given pixel co-ordinate into the coresponding cartesian co-ordinate
+        :param px_x: X value for co-oridnate
+        :param px_y: Y value for co-ordinate
+        :return:
+        """
+        prop_x = px_x/self.graph_width
+        prop_y = px_y/self.graph_height
+        return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
 
     def generate_axes(self,pos,size,col):
         with self.graph.canvas:
