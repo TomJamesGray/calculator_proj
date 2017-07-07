@@ -212,19 +212,20 @@ class GraphingCalc(Widget):
     def graph_it_btn(self):
         Clock.schedule_interval(self.graph_it, 1)
 
-    def graph_it(self,ignore_lims=False):
+    def graph_it(self,reinitialse=False):
         with self.graph.canvas:
-            if ignore_lims:
-                # Update x,y maxes and mins and step
-                self.x_min = float(self.min_x_input.text)
-                self.x_max = float(self.max_x_input.text)
-                self.y_min = float(self.min_y_input.text)
-                self.y_max = float(self.max_y_input.text)
-                self.x_step = float(self.x_step_input.text)
-                self.y_step = float(self.y_step_input.text)
-                # Re-initialise graph
+            # if ignore_lims:
+            #     # Update x,y maxes and mins and step
+            #     self.x_min = float(self.min_x_input.text)
+            #     self.x_max = float(self.max_x_input.text)
+            #     self.y_min = float(self.min_y_input.text)
+            #     self.y_max = float(self.max_y_input.text)
+            #     self.x_step = float(self.x_step_input.text)
+            #     self.y_step = float(self.y_step_input.text)
+            #     # Re-initialise graph
+            #     self.initialise_graph()
+            if reinitialse:
                 self.initialise_graph()
-
             # Step over any anim_vars
             cur_anim_vars = []
             if self.anim_vars != []:
