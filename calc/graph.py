@@ -245,9 +245,14 @@ class GraphingCalc(Widget):
                     for var in cur_anim_vars:
                         f_line = f_line.replace(var["name"], str(var["val"]))
 
-                for px_x in range(0, self.graph_width):
+                for px_x in range(0, self.graph_width,2):
                     carte_x = self.px_to_carte(px_x, 0)[0]
-                    carte_y = calculations.parse_line(f_line.replace("x",str(carte_x)))
+                    try:
+                        carte_y = calculations.parse_line(f_line.replace("x",str(carte_x)))
+                    except Exception:
+                        prev_x = None
+                        prev_y = None
+                        continue
 
                     if prev_x == None:
                         prev_x = carte_x
