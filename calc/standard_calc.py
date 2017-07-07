@@ -264,18 +264,17 @@ class GraphingCalc(Widget):
         return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
 
     def graph_move(self,*args):
-        print("---")
         dx = -int(args[1].dx)
         dy = -int(args[1].dy)
         dx_carte,dy_carte = self.px_to_carte(dx,dy)
         dx_carte = dx_carte-self.x_min
         dy_carte = dy_carte-self.y_min
-        print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
+        # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
         self.y_min = self.y_min + dy_carte
         self.y_max = self.y_max + dy_carte
         self.x_min = self.x_min + dx_carte
         self.x_max = self.x_max + dx_carte
-        print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
+        # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
         self.initialise_graph()
         self.graph_it()
 
