@@ -42,7 +42,7 @@ class GraphingCalc(Widget):
         Window.bind(on_touch_up=self.graph_mouse_pos)
         Window.bind(on_touch_move=self.graph_move)
         self.function_inputs = [[self.function_input,self.function_colour_input]]
-        self.anim_var_inputs = []
+        self.anim_vars = []
         self.colour_maps = {
             "Colour":(0,0,0,1),
             "Black":(0,0,0,1),
@@ -202,14 +202,33 @@ class GraphingCalc(Widget):
                 # Re-initialise graph
                 self.initialise_graph()
 
+            # Step over any anim_vars
+            cur_anim_vars = []
+            if self.anim_vars != []:
+                for var in self.anim_vars:
+                    x = var.step()
+                    cur_anim_vars.append({"name":var.name_in.text,"val":x})
+
+            print("Anim var values: {}".format(cur_anim_vars))
+
             # Graph each function in function_inputs
             for func in self.function_inputs:
+                f_line = func[0].text
+                print("Starting f_line: {}".format(f_line))
                 func_col = self.colour_maps[func[1].text]
                 prev_x = None
                 prev_y = None
+
+                # Insert any anim vars
+                if self.anim_vars != []:
+                    for var in cur_anim_vars:
+                        print("Anim var name: {}, value: {}".format(var["name"],var["val"]))
+                        f_line = f_line.replace(var["name"], str(var["val"]))
+                        print("New f_line: {}".format(f_line))
+
                 for px_x in range(0, self.graph_width):
                     carte_x = self.px_to_carte(px_x, 0)[0]
-                    carte_y = calculations.parse_line(func[0].text.replace("x",str(carte_x)))
+                    carte_y = calculations.parse_line(f_line.replace("x",str(carte_x)))
 
                     if prev_x == None:
                         prev_x = carte_x
@@ -246,8 +265,35 @@ class GraphingCalc(Widget):
         min = TextInput(write_tab=False,font_size="10sp")
         max = TextInput(write_tab=False,font_size="10sp")
         step = TextInput(write_tab=False,font_size="10sp")
-        self.anim_var_inputs.append([name,min,max,step])
-        for i,x in enumerate(["Name","Min","Max","Step"]):
-            container.add_widget(Label(font_size="10sp",text=x))
-            container.add_widget(self.anim_var_inputs[-1][i])
+        self.anim_vars.append(AnimVar(name,min,max,step))
+        # for i,x in enumerate(["Name","Min","Max","Step"]):
+
+        container.add_widget(Label(font_size="10sp",text="Name"))
+        container.add_widget(name)
+        container.add_widget(Label(font_size="10sp", text="Min"))
+        container.add_widget(min)
+        container.add_widget(Label(font_size="10sp", text="Max"))
+        container.add_widget(max)
+        container.add_widget(Label(font_size="10sp", text="Step"))
+        container.add_widget(step)
+
         self.function_grid.add_widget(container)
+
+class AnimVar(object):
+    def __init__(self,name_in,min_in,max_in,step_in):
+        self.name_in = name_in
+        self.min_in = min_in
+        self.max_in = max_in
+        self.step_in = step_in
+        self.current = None
+
+    def step(self):
+        if self.current == None:
+            self.current = float(self.min_in.text)
+
+        if self.current + float(self.step_in.text) > float(self.max_in.text):
+            self.current = float(self.max_in.text)
+        else:
+            self.current += float(self.step_in.text)
+
+        return self.current
