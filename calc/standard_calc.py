@@ -162,6 +162,8 @@ class GraphingCalc(Widget):
         self.x_label_objects = None
         self.y_label_objects = None
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
+        # Window.bind(on_touch_down=self.graph_move)
+        Window.bind(on_touch_move=self.graph_move)
         self.function_inputs = [[self.function_input,self.function_colour_input]]
         self.colour_maps = {
             "Colour":(0,0,0,1),
@@ -189,11 +191,12 @@ class GraphingCalc(Widget):
             self.generate_axes(self.carte_to_px(self.x_min, 0), (400, 1), (0, 0, 0, 1))
 
             # Minor y axes
-            for i in range(self.x_min, self.x_max + self.x_step, self.x_step):
+            #TODO Don't use range to allow for decimal steps, etc
+            for i in range(int(self.x_min), int(self.x_max + self.x_step), int(self.x_step)):
                 self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
 
             # Minor x axes
-            for i in range(self.y_min, self.y_max + self.y_step, self.y_step):
+            for i in range(int(self.y_min), int(self.y_max + self.y_step), int(self.y_step)):
                 self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
 
             # If labels already exist remove them (incase limits have changed)
@@ -208,7 +211,7 @@ class GraphingCalc(Widget):
             self.y_label_objects = []
 
             # Add x labels
-            x_labels = list(range(self.x_min,self.x_max+self.x_step,self.x_step))
+            x_labels = list(range(int(self.x_min),int(self.x_max+self.x_step),int(self.x_step)))
             x_spacing = self.graph_width/len(x_labels)
 
             for i,lbl in enumerate(x_labels):
@@ -217,8 +220,7 @@ class GraphingCalc(Widget):
                 self.x_label_objects.append(a)
 
             # Add y labels
-            y_labels = list(range(self.y_min, self.y_max + self.y_step, self.y_step))
-            print("Y labels: {}".format(y_labels))
+            y_labels = list(range(int(self.y_min), int(self.y_max + self.y_step), int(self.y_step)))
             y_spacing = self.graph_height / len(y_labels)
 
             for i, lbl in enumerate(y_labels):
@@ -253,28 +255,46 @@ class GraphingCalc(Widget):
         prop_y = px_y/self.graph_height
         return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
 
+    def graph_move(self,*args):
+        print("---")
+        dx = int(args[1].dx)
+        dy = int(args[1].dy)
+        dx_carte,dy_carte = self.px_to_carte(dx,dy)
+        dx_carte = dx_carte-self.x_min
+        dy_carte = dy_carte-self.y_min
+        print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
+        self.y_min = self.y_min + dy_carte
+        self.y_max = self.y_max + dy_carte
+        self.x_min = self.x_min + dx_carte
+        self.x_max = self.x_max + dx_carte
+        print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
+        self.initialise_graph()
+        self.graph_it()
+
+
+
     def generate_axes(self,pos,size,col):
         with self.graph.canvas:
             Color(*col)
             Rectangle(pos=pos,size=size)
             # Translate(xy=self.pos)
 
-    def graph_it(self):
+    def graph_it(self,ignore_lims=False):
         with self.graph.canvas:
-            # Update x,y maxes and mins and step
-            self.x_min = int(self.min_x_input.text)
-            self.x_max = int(self.max_x_input.text)
-            self.y_min = int(self.min_y_input.text)
-            self.y_max = int(self.max_y_input.text)
-            self.x_step = int(self.x_step_input.text)
-            self.y_step = int(self.y_step_input.text)
-            # Re-initialise graph
-            self.initialise_graph()
+            if ignore_lims:
+                # Update x,y maxes and mins and step
+                self.x_min = float(self.min_x_input.text)
+                self.x_max = float(self.max_x_input.text)
+                self.y_min = float(self.min_y_input.text)
+                self.y_max = float(self.max_y_input.text)
+                self.x_step = float(self.x_step_input.text)
+                self.y_step = float(self.y_step_input.text)
+                # Re-initialise graph
+                self.initialise_graph()
 
             # Graph each function in function_inputs
             for func in self.function_inputs:
                 func_col = self.colour_maps[func[1].text]
-                print("Function color: {}".format(func_col))
                 prev_x = None
                 prev_y = None
                 for px_x in range(0, self.graph_width):
