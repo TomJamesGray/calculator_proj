@@ -1,124 +1,233 @@
-import tkinter as tk
-#Don't know why the font isn't imported with the above import
-from tkinter import font
-import logging
-from calc.calculations import parse_line,special_functions
-from calc.helpers import nested_contains
+from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.core.window import Window
+from kivy.properties import ObjectProperty
+from kivy.graphics import Rectangle,Color,Translate,Line
+from calc import calculations
+from calc.helpers import float_range,float_round
 
-def float_range(low,high,increment=1):
-    """similar to the builtin range function, but this 
-    has support for a decimal increment value
-    """
-    y = low
-    while high >= y:
-        yield y
-        y += round(increment,2)
 
-class App:
-    def __init__(self, master):
-        """ Initialise basic graph attributes and draw
-        grid lines
+class GraphingCalc(Widget):
+    function_input = ObjectProperty(None)
+    function_colour_input = ObjectProperty(None)
+    function_grid = ObjectProperty(None)
+    max_x_input = ObjectProperty(None)
+    min_x_input = ObjectProperty(None)
+    max_y_input = ObjectProperty(None)
+    min_y_input = ObjectProperty(None)
+    x_step_input = ObjectProperty(None)
+    y_step_input = ObjectProperty(None)
+
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.x_max = 5
+        self.x_min = -5
+        self.x_grid_step = 1
+        self.x_label_step = 1
+        self.y_max = 5
+        self.y_min = -5
+        self.y_grid_step = 1
+        self.y_label_step = 1
+        self.graph_width = 400
+        self.graph_height = 410
+        self.x_label_objects = None
+        self.y_label_objects = None
+        self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
+        Window.bind(on_touch_up=self.graph_mouse_pos)
+        Window.bind(on_touch_move=self.graph_move)
+        self.function_inputs = [[self.function_input,self.function_colour_input]]
+        self.colour_maps = {
+            "Colour":(0,0,0,1),
+            "Black":(0,0,0,1),
+            "Red":(1,0,0,1),
+            "Blue":(0,0,1,1)
+        }
+
+        self.initialise_graph()
+        self.add_widget(self.graph)
+
+    def initialise_graph(self):
         """
-        self.width, self.height = 600,600
-        self.min_x,self.max_x = -10,10
-        self.min_y,self.max_y = -10,10
+        Initialises the graph layout, works if canvas is or isn't already populated. Also resets
+        the axis labels
+        """
+        with self.graph.canvas:
+            Color(1,1,1,1)
+            Rectangle(pos=(0,0),size=self.graph.size)
+            Color(0,0,0,1)
+            # Major Y axis
+            self.generate_axes(self.carte_to_px(0, self.y_min), (1, 410), (0, 0, 0, 1))
 
-        self.sf = self.width/(abs(self.min_x)+abs(self.max_x))
-        self.float_plot_interval = 0.25
-        
-        #Create equation box and set fonts
-        logging.info("Starting graphing mode")
-        self.f = tk.Frame(master)
-        self.equation_box = tk.Entry(self.f,font=font.Font(size=16))
-        self.equation_box.grid(column=0,row=0)
-        
-        #Create button to draw the graph
-        tk.Button(self.f,text="Graph it",
-                command=lambda: self.graph_it()).grid(column=0,row=1)
-        
-        #Initialise graph canvas
-        self.canvas = tk.Canvas(self.f,width=self.width,height=self.height,
-                bg="#FFFFFF")
-        self.canvas.grid(column=1,row=0)
-        #Draw graph axes
-        self.canvas.create_line(0,self.height/2,self.width,self.height/2,fill="#AAAAAA",tags="x-axis",
-                width=2)
-        self.canvas.create_line(self.width/2,0,self.width/2,self.height,fill="#AAAAAA",tags="y-axis",
-                width=2)
+            # Major X axis
+            self.generate_axes(self.carte_to_px(self.x_min, 0), (400, 1), (0, 0, 0, 1))
 
-        #Show gridlines every 1 unit
-        grid_lines_every = 1
-        for x in range(self.min_x,self.max_x+1,grid_lines_every):
-            if x != 0:
-                self.canvas.create_line([(x+self.width/2,0),
-                    (x+self.width/2,self.height)],tags="grid_line",fill="#DADADA")
+            # Minor y axes
+            for i in float_range(float_round(self.x_min,self.x_grid_step),
+                                 float_round(self.x_max + self.x_grid_step,self.x_grid_step), self.x_grid_step):
+                self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
 
-        for y in range(self.min_y,self.max_y+1,grid_lines_every):
-            if y != 0:
-                self.canvas.create_line([(0,y+self.height/2),
-                    (self.width,y+self.height/2)],tags="grid_line",fill="#DADADA")
-        
-        #Show intervals every 5 units, add 1 to max_x, so it's
-        #included in the loop
-        for x in range(self.min_x,self.max_x+1,5):
-            if x != self.max_x:
-                self.canvas.create_text(x+self.width/2,self.height/2,anchor=tk.NW,
-                    text=str(x),tags=("x-axis","label"))
+            # Minor x axes
+            for i in float_range(float_round(self.y_min, self.y_grid_step),
+                                 float_round(self.y_max + self.y_grid_step, self.y_grid_step), self.y_grid_step):
+                self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
+
+            # If labels already exist remove them (incase limits have changed)
+            if self.x_label_objects != None:
+                for lbl in self.x_label_objects:
+                    lbl.clear_widgets()
+
+                for lbl in self.y_label_objects:
+                    lbl.clear_widgets()
+
+            self.x_label_objects = []
+            self.y_label_objects = []
+
+            # Add x labels
+            x_labels = list(range(int(self.x_min),int(self.x_max+self.x_label_step),self.x_label_step))
+            x_spacing = self.graph_width/len(x_labels)
+
+            for i,lbl in enumerate(x_labels):
+                x,y = self.carte_to_px(x_labels[i], 0)
+                # Check if label would go outside canvas
+                if x < 0 or y+10 > self.graph_height:
+                    continue
+                a = Label(pos=(x,y), font_size="8sp", width=7, height=10,
+                          color=(0, 0, 0, 1), text=str(x_labels[i]))
+                self.x_label_objects.append(a)
+
+            # Add y labels
+            y_labels = list(range(int(self.y_min), int(self.y_max + self.y_label_step), self.y_label_step))
+            y_spacing = self.graph_height / len(y_labels)
+
+            for i, lbl in enumerate(y_labels):
+                x, y = self.carte_to_px(0,y_labels[i])
+                # Check if label would go outside canvas
+                if x < 0 or y+10 > self.graph_height:
+                    continue
+                # Don't repeat 0 as already done on x label run
+                if y_labels[i] == 0:
+                    continue
+                a = Label(pos=self.carte_to_px(0,y_labels[i]), font_size="8sp", width=7, height=10,
+                          color=(0, 0, 0, 1), text=str(y_labels[i]))
+                self.y_label_objects.append(a)
+
+            Translate(xy=self.pos)
+
+    def carte_to_px(self,carte_x,carte_y):
+        """
+        Converts a given cartesian co-ordinate for the graph to the pixels for drawing
+        :param carte_x: X value for co-ordinate
+        :param carte_y: Y Value for co-ordinate
+        :return: (X,Y) tuple with co-ordinates in pixels on the graph
+        """
+        dx = carte_x - self.x_min
+        dy = carte_y - self.y_min
+        return (int(dx*self.graph_width/(self.x_max-self.x_min)),int(dy*self.graph_height)/(self.y_max-self.y_min))
+
+    def px_to_carte(self,px_x,px_y):
+        """
+        Converts a given pixel co-ordinate into the coresponding cartesian co-ordinate
+        :param px_x: X value for co-oridnatea
+        :param px_y: Y value for co-ordinate
+        :return:
+        """
+        prop_x = px_x/self.graph_width
+        prop_y = px_y/self.graph_height
+        return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
+
+    def graph_move(self,*args):
+        dx = -int(args[1].dx)
+        dy = -int(args[1].dy)
+        dx_carte,dy_carte = self.px_to_carte(dx,dy)
+        dx_carte = dx_carte-self.x_min
+        dy_carte = dy_carte-self.y_min
+        # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
+        self.y_min = self.y_min + dy_carte
+        self.y_max = self.y_max + dy_carte
+        self.x_min = self.x_min + dx_carte
+        self.x_max = self.x_max + dx_carte
+        # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
+        self.initialise_graph()
+        self.graph_it()
+
+    def graph_mouse_pos(self,*args):
+        """
+        Checks if the mouse is over the graph canvas then zooms in/out if scroll whell is used
+        :param args:
+        :return:
+        """
+        x_px = int(args[1].pos[0])
+        y_px = int(args[1].pos[1])
+        if self.graph.collide_point(x_px,y_px):
+            btn = args[1].button
+            if btn == "scrollup":
+                zoom_factor = 1.05
+            elif btn == "scrolldown":
+                zoom_factor = 0.95
             else:
-                self.canvas.create_text(x+self.width/2,self.height/2,anchor=tk.NE,
-                    text=str(x),tags=("x-axis","label"))
-         
-        for y in range(self.min_y,self.max_y+1,5):
-            if y != self.max_y:
-                self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.NW,
-                    text=str(-1*y),tags=("y-axis","label"))
-            else:
-                self.canvas.create_text(self.width/2,y+self.height/2,anchor=tk.SW,
-                    text=str(-1*y),tags=("y-axis","label"))
+                return False
+            self.x_max *= zoom_factor
+            self.x_min *= zoom_factor
+            self.y_max *= zoom_factor
+            self.y_min *= zoom_factor
+            self.initialise_graph()
+            self.graph_it()
 
-        self.canvas.scale("label",self.width/2,self.height/2,
-            self.sf,self.sf)
-        self.canvas.scale("grid_line",self.width/2,self.height/2,
-            self.sf,self.sf)
-        self.f.pack()
+    def generate_axes(self,pos,size,col):
+        # Check axis won't go outside of canvas
+        if pos[0] < 0 or pos[1] > self.graph_height:
+            return False
+        with self.graph.canvas:
+            Color(*col)
+            Rectangle(pos=pos,size=size)
+            # Translate(xy=self.pos)
 
-    def set_plot_interval(self,interval):
-        """Sets the plot interval used for non-linear functions
-        """
-        self.float_plot_interval = interval
-        logging.info("Plot interval {}".format(interval))
-    
-    def graph_it(self):
-        """Create a graph from the contents of the equation box 
-        replacing x with the current x value
-        """
-        self.canvas.delete("line")
-        equation = self.equation_box.get()
-        cords = []
-        #If equation is linear, ie no powers then plot with interval
-        #of 1, if not then plot at interval of 0.5
-        logging.info("equation: {}".format(equation))
-        
-        if "^" in equation or nested_contains(special_functions,equation):
-            plot_interval = self.float_plot_interval
-        else:
-            plot_interval = 1
-        logging.info("Plot interval: {}".format(plot_interval))
+    def graph_it(self,ignore_lims=False):
+        with self.graph.canvas:
+            if ignore_lims:
+                # Update x,y maxes and mins and step
+                self.x_min = float(self.min_x_input.text)
+                self.x_max = float(self.max_x_input.text)
+                self.y_min = float(self.min_y_input.text)
+                self.y_max = float(self.max_y_input.text)
+                self.x_step = float(self.x_step_input.text)
+                self.y_step = float(self.y_step_input.text)
+                # Re-initialise graph
+                self.initialise_graph()
 
-        for x in float_range(self.min_x,self.max_x,plot_interval):
-            try:
-                cords.append((
-                    round(x+self.width/2,2),#add half of width to center the origin
-                    round(-1*(parse_line(equation,x=x)-self.height/2),2)
-                ))
-                #Invert the origin for y so -ve values are in bottom half and center
-                #the origin by taking away half the height
-            except Exception as e:
-                #Catch errors and don't plot the values but don't crash
-                logging.error("Error: {} \nRaised at x val: {}".format(e,x))
+            # Graph each function in function_inputs
+            for func in self.function_inputs:
+                func_col = self.colour_maps[func[1].text]
+                prev_x = None
+                prev_y = None
+                for px_x in range(0, self.graph_width):
+                    carte_x = self.px_to_carte(px_x, 0)[0]
+                    carte_y = calculations.parse_line(func[0].text.replace("x",str(carte_x)))
 
-        logging.info("Coordinates: {}".format(cords)) 
-        self.canvas.create_line(cords,tags="line")
-        #Scale the line so it takes up all of the graph 
-        self.canvas.scale("line",self.width/2,self.height/2,self.sf,self.sf)
+                    if prev_x == None:
+                        prev_x = carte_x
+                        prev_y = carte_y
+                    else:
+                        Color(*func_col)
+                        px_x,px_y = self.carte_to_px(carte_x,carte_y)
 
+                        if px_y > self.graph_height or px_y < 0:
+                            # Point goes outside canvas so don't graph it and reset prev_x and prev_y
+                            prev_x = None
+                            prev_y = None
+                            continue
+                        else:
+                            Line(points=[px_x,px_y, *self.carte_to_px(prev_x, prev_y)], width=1.01)
+                            prev_x = carte_x
+                            prev_y = carte_y
+                Translate(xy=self.pos)
+
+    def add_function(self):
+        self.function_grid.add_widget(Label(text="y = "))
+        new_input = TextInput(write_tab=False)
+        new_col_input = ColourSpinner()
+        self.function_inputs.append([new_input,new_col_input])
+        self.function_grid.add_widget(new_input)
+        self.function_grid.add_widget(new_col_input)
