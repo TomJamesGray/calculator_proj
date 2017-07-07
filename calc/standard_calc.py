@@ -265,8 +265,8 @@ class GraphingCalc(Widget):
 
     def graph_move(self,*args):
         print("---")
-        dx = int(args[1].dx)
-        dy = int(args[1].dy)
+        dx = -int(args[1].dx)
+        dy = -int(args[1].dy)
         dx_carte,dy_carte = self.px_to_carte(dx,dy)
         dx_carte = dx_carte-self.x_min
         dy_carte = dy_carte-self.y_min
