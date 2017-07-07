@@ -182,11 +182,23 @@ class GraphingCalc(Widget):
             self.initialise_graph()
             self.graph_it()
 
-    def pause_play(self):
+    def pause_play(self,btn):
         if self.graph_it_loop == None:
-            self.graph_it_loop = Clock.schedule_interval(self.graph_it, 0.1)
+            # Start animated vars
+            if self.anim_vars != []:
+                for var in self.anim_vars:
+                    var.disabled = False
+                self.graph_it_loop = Clock.schedule_interval(self.graph_it, 0.1)
+            btn.text = "Pause"
         else:
+            # Stop animated vars
             self.graph_it_loop.cancel()
+            # Disable all anim vars
+            if self.anim_vars != []:
+                for var in self.anim_vars:
+                    var.disabled = True
+            self.graph_it_loop = None
+            btn.text = "Play"
 
     def generate_axes(self,pos,size,col):
         # Check axis won't go outside of canvas
@@ -292,14 +304,18 @@ class AnimVar(object):
         self.max_in = max_in
         self.step_in = step_in
         self.current = None
+        self.disabled = True
 
     def step(self):
         if self.current == None:
             self.current = float(self.min_in.text)
 
+        if self.disabled:
+            return self.current
+
         if self.current + float(self.step_in.text) > float(self.max_in.text):
             self.current = float(self.min_in.text)
         else:
             self.current += float(self.step_in.text)
-        print("Var at: {}".format(self.current))
+
         return self.current
