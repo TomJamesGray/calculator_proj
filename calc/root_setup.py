@@ -16,15 +16,15 @@ logging_config = {
         "gui":{
             "class":"logging.StreamHandler",
             "formatter":"main",
-            "level":"ERROR"}
+            "level":"DEBUG"}
     },
     "loggers":{
-        "calc.calculations":{
+        "calc.standard_calc":{
             "handlers":["calculations"],
             "level":"DEBUG"},
         "calc":{
             "handlers":["gui"],
-            "level":"ERROR"}
+            "level":"DEBUG"}
     }
 }
 

@@ -29,6 +29,13 @@
 
 <GraphingCalc>
     function_input:function_input
+    max_x_input:max_x_input
+    min_x_input:min_x_input
+    max_y_input:max_y_input
+    min_y_input:min_y_input
+    x_step_input:x_step_input
+    y_step_input:y_step_input
+
     ActionBar:
         width:root.width
         size_hint_x:1
@@ -45,20 +52,89 @@
             ActionButton:
                 on_press:root.graph_mode()
                 text:"Standard mode"
+
+
+    ScrollView:
+        height:root.height-40-90-20
+        width:200
+        pos:(0,110)
+        size_hint:(1,None)
+        GridLayout:
+            width:200
+            size_hint_y:None
+            pos:(0,root.height-40)
+            padding:0,10
+            height:self.minimum_height
+            cols:2
+            row_default_height:30
+            row_force_default:True
+            cols_minimum:{0:50,1:150}
+            Label:
+                text:"f(x) = "
+            TextInput:
+                id:function_input
+            Button:
+                text:"Plot it"
+                on_press:root.graph_it()
+
     GridLayout:
         width:200
-        height:root.height-40
-        padding:0,10
-        pos:0,0
-        cols:2
+        size_hint:(None,None)
         row_default_height:30
         row_force_default:True
-        cols_minimum:{0:50,1:150}
+        cols:4
         Label:
-            text:"f(x) = "
+            text:"Max X"
+            font_size:"10sp"
+            halign:"center"
         TextInput:
-            id:function_input
-        Button:
-            text:"Plot"
-            on_press:root.graph_it()
+            write_tab:False
+            text:"5"
+            id:max_x_input
+        Label:
+            text:"Min X"
+            font_size:"10sp"
+            halign:"center"
+            write_tab:False
+        TextInput:
+            write_tab:False
+            text:"-5"
+            id:min_x_input
+        Label:
+            text:"Max Y"
+            font_size:"10sp"
+            halign:"center"
+            write_tab:False
+        TextInput:
+            write_tab:False
+            text:"5"
+            id:max_y_input
+        Label:
+            text:"Min Y"
+            font_size:"10sp"
+            halign:"center"
+            write_tab:False
+        TextInput:
+            write_tab:False
+            text:"-5"
+            id:min_y_input
+        Label:
+            text:"X Step"
+            font_size:"10sp"
+            halign:"center"
+            write_tab:False
+        TextInput:
+            write_tab:False
+            text:"1"
+            id:x_step_input
+        Label:
+            text:"Y Step"
+            font_size:"10sp"
+            halign:"center"
+            write_tab:False
+        TextInput:
+            write_tab:False
+            text:"1"
+            id:y_step_input
+
 

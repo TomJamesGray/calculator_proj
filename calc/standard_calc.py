@@ -136,13 +136,19 @@ class Calculator(Widget):
 
 class GraphingCalc(Widget):
     function_input = ObjectProperty(None)
+    max_x_input = ObjectProperty(None)
+    min_x_input = ObjectProperty(None)
+    max_y_input = ObjectProperty(None)
+    min_y_input = ObjectProperty(None)
+    x_step_input = ObjectProperty(None)
+    y_step_input = ObjectProperty(None)
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.x_max = 6
-        self.x_min = -6
+        self.x_max = 5
+        self.x_min = -5
         self.x_step = 1
-        self.y_max = 6
-        self.y_min = -6
+        self.y_max = 5
+        self.y_min = -5
         self.y_step = 1
         self.graph_width = 400
         self.graph_height = 410
@@ -241,6 +247,13 @@ class GraphingCalc(Widget):
 
     def graph_it(self):
         with self.graph.canvas:
+            # Update x,y maxes and mins and step
+            self.x_min = int(self.min_x_input.text)
+            self.x_max = int(self.max_x_input.text)
+            self.y_min = int(self.min_y_input.text)
+            self.y_max = int(self.max_y_input.text)
+            self.x_step = int(self.x_step_input.text)
+            self.y_step = int(self.y_step_input.text)
             # Re-initialise graph
             self.initialise_graph()
             prev_x = None
@@ -252,7 +265,7 @@ class GraphingCalc(Widget):
                     prev_x = carte_x
                     prev_y = carte_y
                 else:
-                    Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.05)
+                    Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.01)
                     prev_x = carte_x
                     prev_y = carte_y
             Translate(xy=self.pos)
