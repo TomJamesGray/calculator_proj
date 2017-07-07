@@ -165,6 +165,7 @@ class GraphingCalc(Widget):
         self.function_inputs = [[self.function_input,self.function_colour_input]]
         self.colour_maps = {
             "Colour":(0,0,0,1),
+            "Black":(0,0,0,1),
             "Red":(1,0,0,1),
             "Blue":(0,0,1,1)
         }
