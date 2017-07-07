@@ -1,3 +1,5 @@
+#:import Factory kivy.factory.Factory
+
 <Calculator>
     screen:screen
     ActionBar:
@@ -27,8 +29,27 @@
         cursor_color:0.8,0.8,0.8,1
         font_size:25
 
+<ColourSpinnerOption@SpinnerOption>
+    font_size:"12sp"
+    height:20
+    background_normal:""
+    background_color:(1,1,1,1)
+    color:(0,0,0,1)
+
+<ColourSpinner@Spinner>
+    text:"Colour"
+    values:["Black","Red","Blue"]
+    sync_height:True
+#    height:20
+    font_size:"12sp"
+    background_color:(1,1,1,1)
+    background_normal:""
+    color:(0,0,0,1)
+    option_cls:Factory.get("ColourSpinnerOption")
+
 <GraphingCalc>
     function_input:function_input
+    function_colour_input:function_colour_input
     function_grid:function_grid
     max_x_input:max_x_input
     min_x_input:min_x_input
@@ -57,7 +78,7 @@
     GridLayout:
         cols:2
         pos:(0,root.height-75)
-        width:200
+        width:300
         height:30
         row_default_height:30
         row_force_default:True
@@ -70,28 +91,32 @@
 
     ScrollView:
         height:root.height-40-90-20-30
-        width:200
+        width:300
         pos:(0,110)
         size_hint:(1,None)
         GridLayout:
             id:function_grid
-            width:200
+            width:300
             size_hint_y:None
             pos:(0,root.height-40)
             padding:0,10
+            spacing:5,5
             height:self.minimum_height
-            cols:2
+            cols:3
             row_default_height:30
             row_force_default:True
-            cols_minimum:{0:50,1:150}
+            cols_minimum:{0:45,1:145,2:95}
             Label:
                 text:"y = "
             TextInput:
                 id:function_input
+            ColourSpinner:
+                id:function_colour_input
+
 
 
     GridLayout:
-        width:200
+        width:300
         size_hint:(None,None)
         row_default_height:30
         row_force_default:True

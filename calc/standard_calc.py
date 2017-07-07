@@ -128,15 +128,17 @@ class Calculator(Widget):
         Switch to the graphing mode
         :return:
         """
-        Window.size = (600,450)
+        Window.size = (700,450)
         self.clear_widgets()
-        self.add_widget(GraphingCalc(pos=(0,0),width=600,height=450))
+        self.add_widget(GraphingCalc(pos=(0,0),width=700,height=450))
 
     def clear_line(self):
         self.screen.text = ""
 
+
 class GraphingCalc(Widget):
     function_input = ObjectProperty(None)
+    function_colour_input = ObjectProperty(None)
     function_grid = ObjectProperty(None)
     max_x_input = ObjectProperty(None)
     min_x_input = ObjectProperty(None)
@@ -156,8 +158,13 @@ class GraphingCalc(Widget):
         self.graph_height = 410
         self.x_label_objects = None
         self.y_label_objects = None
-        self.graph = RelativeLayout(pos=(200,0),width=self.graph_width,height=self.graph_height)
-        self.function_inputs = [self.function_input]
+        self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
+        self.function_inputs = [[self.function_input,self.function_colour_input]]
+        self.colour_maps = {
+            "Colour":(0,0,0,1),
+            "Red":(1,0,0,1),
+            "Blue":(0,0,1,1)
+        }
 
         self.initialise_graph()
         self.add_widget(self.graph)
@@ -260,15 +267,18 @@ class GraphingCalc(Widget):
             # Re-initialise graph
             self.initialise_graph()
             for func in self.function_inputs:
+                func_col = self.colour_maps[func[1].text]
+                print("Function color: {}".format(func_col))
                 prev_x = None
                 prev_y = None
                 for px_x in range(0, self.graph_width):
                     carte_x = self.px_to_carte(px_x, 0)[0]
-                    carte_y = calculations.parse_line(func.text.replace("x",str(carte_x)))
+                    carte_y = calculations.parse_line(func[0].text.replace("x",str(carte_x)))
                     if prev_x == None:
                         prev_x = carte_x
                         prev_y = carte_y
                     else:
+                        Color(*func_col)
                         Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.01)
                         prev_x = carte_x
                         prev_y = carte_y
