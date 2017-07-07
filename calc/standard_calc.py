@@ -215,7 +215,11 @@ class GraphingCalc(Widget):
             x_spacing = self.graph_width/len(x_labels)
 
             for i,lbl in enumerate(x_labels):
-                a = Label(pos=self.carte_to_px(x_labels[i],0), font_size="8sp", width=7, height=10,
+                x,y = self.carte_to_px(x_labels[i], 0)
+                # Check if label would go outside canvas
+                if x < 0 or y+10 > self.graph_height:
+                    continue
+                a = Label(pos=(x,y), font_size="8sp", width=7, height=10,
                           color=(0, 0, 0, 1), text=str(x_labels[i]))
                 self.x_label_objects.append(a)
 
@@ -224,6 +228,10 @@ class GraphingCalc(Widget):
             y_spacing = self.graph_height / len(y_labels)
 
             for i, lbl in enumerate(y_labels):
+                x, y = self.carte_to_px(0,y_labels[i])
+                # Check if label would go outside canvas
+                if x < 0 or y+10 > self.graph_height:
+                    continue
                 # Don't repeat 0 as already done on x label run
                 if y_labels[i] == 0:
                     continue
@@ -274,6 +282,9 @@ class GraphingCalc(Widget):
 
 
     def generate_axes(self,pos,size,col):
+        # Check axis won't go outside of canvas
+        if pos[0] < 0 or pos[1] > self.graph_height:
+            return False
         with self.graph.canvas:
             Color(*col)
             Rectangle(pos=pos,size=size)
