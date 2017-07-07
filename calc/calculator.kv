@@ -29,6 +29,7 @@
 
 <GraphingCalc>
     function_input:function_input
+    function_grid:function_grid
     max_x_input:max_x_input
     min_x_input:min_x_input
     max_y_input:max_y_input
@@ -53,13 +54,27 @@
                 on_press:root.graph_mode()
                 text:"Standard mode"
 
+    GridLayout:
+        cols:2
+        pos:(0,root.height-75)
+        width:200
+        height:30
+        row_default_height:30
+        row_force_default:True
+        Button:
+            text:"Plot it"
+            on_press:root.graph_it()
+        Button:
+            text:"Add function"
+            on_press:root.add_function()
 
     ScrollView:
-        height:root.height-40-90-20
+        height:root.height-40-90-20-30
         width:200
         pos:(0,110)
         size_hint:(1,None)
         GridLayout:
+            id:function_grid
             width:200
             size_hint_y:None
             pos:(0,root.height-40)
@@ -70,12 +85,10 @@
             row_force_default:True
             cols_minimum:{0:50,1:150}
             Label:
-                text:"f(x) = "
+                text:"y = "
             TextInput:
                 id:function_input
-            Button:
-                text:"Plot it"
-                on_press:root.graph_it()
+
 
     GridLayout:
         width:200

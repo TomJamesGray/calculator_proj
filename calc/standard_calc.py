@@ -8,6 +8,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.core.window import Window
@@ -136,6 +137,7 @@ class Calculator(Widget):
 
 class GraphingCalc(Widget):
     function_input = ObjectProperty(None)
+    function_grid = ObjectProperty(None)
     max_x_input = ObjectProperty(None)
     min_x_input = ObjectProperty(None)
     max_y_input = ObjectProperty(None)
@@ -155,6 +157,7 @@ class GraphingCalc(Widget):
         self.x_label_objects = None
         self.y_label_objects = None
         self.graph = RelativeLayout(pos=(200,0),width=self.graph_width,height=self.graph_height)
+        self.function_inputs = [self.function_input]
 
         self.initialise_graph()
         self.add_widget(self.graph)
@@ -256,19 +259,26 @@ class GraphingCalc(Widget):
             self.y_step = int(self.y_step_input.text)
             # Re-initialise graph
             self.initialise_graph()
-            prev_x = None
-            prev_y = None
-            for px_x in range(0, self.graph_width):
-                carte_x = self.px_to_carte(px_x, 0)[0]
-                carte_y = calculations.parse_line(self.function_input.text.replace("x",str(carte_x)))
-                if prev_x == None:
-                    prev_x = carte_x
-                    prev_y = carte_y
-                else:
-                    Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.01)
-                    prev_x = carte_x
-                    prev_y = carte_y
-            Translate(xy=self.pos)
+            for func in self.function_inputs:
+                prev_x = None
+                prev_y = None
+                for px_x in range(0, self.graph_width):
+                    carte_x = self.px_to_carte(px_x, 0)[0]
+                    carte_y = calculations.parse_line(func.text.replace("x",str(carte_x)))
+                    if prev_x == None:
+                        prev_x = carte_x
+                        prev_y = carte_y
+                    else:
+                        Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.01)
+                        prev_x = carte_x
+                        prev_y = carte_y
+                Translate(xy=self.pos)
+
+    def add_function(self):
+        self.function_grid.add_widget(Label(text="y = "))
+        new_input = TextInput(write_tab=False)
+        self.function_inputs.append(new_input)
+        self.function_grid.add_widget(new_input)
 
 class CalculatorApp(App):
     def build(self):
