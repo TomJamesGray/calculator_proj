@@ -162,7 +162,7 @@ class GraphingCalc(Widget):
         self.x_label_objects = None
         self.y_label_objects = None
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
-        # Window.bind(on_touch_down=self.graph_move)
+        Window.bind(on_touch_up=self.graph_mouse_pos)
         Window.bind(on_touch_move=self.graph_move)
         self.function_inputs = [[self.function_input,self.function_colour_input]]
         self.colour_maps = {
@@ -279,7 +279,28 @@ class GraphingCalc(Widget):
         self.initialise_graph()
         self.graph_it()
 
-
+    def graph_mouse_pos(self,*args):
+        """
+        Checks if the mouse is over the graph canvas then zooms in/out if scroll whell is used
+        :param args:
+        :return:
+        """
+        x_px = int(args[1].pos[0])
+        y_px = int(args[1].pos[1])
+        if self.graph.collide_point(x_px,y_px):
+            btn = args[1].button
+            if btn == "scrollup":
+                zoom_factor = 1.05
+            elif btn == "scrolldown":
+                zoom_factor = 0.95
+            else:
+                return False
+            self.x_max *= zoom_factor
+            self.x_min *= zoom_factor
+            self.y_max *= zoom_factor
+            self.y_min *= zoom_factor
+            self.initialise_graph()
+            self.graph_it()
 
     def generate_axes(self,pos,size,col):
         # Check axis won't go outside of canvas
