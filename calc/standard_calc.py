@@ -9,6 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from kivy.uix.spinner import Spinner
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.core.window import Window
@@ -135,6 +136,8 @@ class Calculator(Widget):
     def clear_line(self):
         self.screen.text = ""
 
+class ColourSpinner(Spinner):
+    pass
 
 class GraphingCalc(Widget):
     function_input = ObjectProperty(None)
@@ -287,8 +290,10 @@ class GraphingCalc(Widget):
     def add_function(self):
         self.function_grid.add_widget(Label(text="y = "))
         new_input = TextInput(write_tab=False)
-        self.function_inputs.append(new_input)
+        new_col_input = ColourSpinner()
+        self.function_inputs.append([new_input,new_col_input])
         self.function_grid.add_widget(new_input)
+        self.function_grid.add_widget(new_col_input)
 
 class CalculatorApp(App):
     def build(self):
