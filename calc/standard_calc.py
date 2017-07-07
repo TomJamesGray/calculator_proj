@@ -270,6 +270,8 @@ class GraphingCalc(Widget):
             self.y_step = int(self.y_step_input.text)
             # Re-initialise graph
             self.initialise_graph()
+
+            # Graph each function in function_inputs
             for func in self.function_inputs:
                 func_col = self.colour_maps[func[1].text]
                 print("Function color: {}".format(func_col))
@@ -278,12 +280,21 @@ class GraphingCalc(Widget):
                 for px_x in range(0, self.graph_width):
                     carte_x = self.px_to_carte(px_x, 0)[0]
                     carte_y = calculations.parse_line(func[0].text.replace("x",str(carte_x)))
+
                     if prev_x == None:
                         prev_x = carte_x
                         prev_y = carte_y
                     else:
                         Color(*func_col)
-                        Line(points=[*self.carte_to_px(carte_x, carte_y), *self.carte_to_px(prev_x, prev_y)], width=1.01)
+                        px_x,px_y = self.carte_to_px(carte_x,carte_y)
+
+                        if px_y > self.graph_height or px_y < 0:
+                            # Point goes outside canvas so don't graph it and reset prev_x and prev_y
+                            prev_x = None
+                            prev_y = None
+                            continue
+
+                        Line(points=[px_x,px_y, *self.carte_to_px(prev_x, prev_y)], width=1.01)
                         prev_x = carte_x
                         prev_y = carte_y
                 Translate(xy=self.pos)
