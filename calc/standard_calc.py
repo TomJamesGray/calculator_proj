@@ -138,8 +138,6 @@ class Calculator(Widget):
     def clear_line(self):
         self.screen.text = ""
 
-class ColourSpinner(Spinner):
-    pass
 
 class CalculatorApp(App):
     def build(self):

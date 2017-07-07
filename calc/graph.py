@@ -1,13 +1,17 @@
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from kivy.uix.spinner import Spinner
 from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
 from kivy.graphics import Rectangle,Color,Translate,Line
 from calc import calculations
 from calc.helpers import float_range,float_round
 
+class ColourSpinner(Spinner):
+    pass
 
 class GraphingCalc(Widget):
     function_input = ObjectProperty(None)
@@ -38,6 +42,7 @@ class GraphingCalc(Widget):
         Window.bind(on_touch_up=self.graph_mouse_pos)
         Window.bind(on_touch_move=self.graph_move)
         self.function_inputs = [[self.function_input,self.function_colour_input]]
+        self.anim_var_inputs = []
         self.colour_maps = {
             "Colour":(0,0,0,1),
             "Black":(0,0,0,1),
@@ -225,9 +230,24 @@ class GraphingCalc(Widget):
                 Translate(xy=self.pos)
 
     def add_function(self):
-        self.function_grid.add_widget(Label(text="y = "))
+        container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:45,1:145,2:95},cols=3,
+                               spacing=(5,5))
+        container.add_widget(Label(text="y = "))
         new_input = TextInput(write_tab=False)
         new_col_input = ColourSpinner()
         self.function_inputs.append([new_input,new_col_input])
-        self.function_grid.add_widget(new_input)
-        self.function_grid.add_widget(new_col_input)
+        container.add_widget(new_input)
+        container.add_widget(new_col_input)
+        self.function_grid.add_widget(container)
+
+    def add_anim_var(self):
+        container = GridLayout(cols=8)
+        name = TextInput(write_tab=False,font_size="10sp")
+        min = TextInput(write_tab=False,font_size="10sp")
+        max = TextInput(write_tab=False,font_size="10sp")
+        step = TextInput(write_tab=False,font_size="10sp")
+        self.anim_var_inputs.append([name,min,max,step])
+        for i,x in enumerate(["Name","Min","Max","Step"]):
+            container.add_widget(Label(font_size="10sp",text=x))
+            container.add_widget(self.anim_var_inputs[-1][i])
+        self.function_grid.add_widget(container)
