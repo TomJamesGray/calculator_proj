@@ -6,9 +6,9 @@ from calc.helpers import nested_in,nested_contains
 #Define the special functions with lambdas
 #and convert from degrees to radians
 special_functions = [
-    ('sin', lambda x: math.sin(math.radians(x))),
-    ('cos', lambda x: math.cos(math.radians(x))),
-    ('tan', lambda x: math.tan(math.radians(x))),
+    ('sin', lambda x: math.sin(x)),
+    ('cos', lambda x: math.cos(x)),
+    ('tan', lambda x: math.tan(x)),
     ('sqrt',lambda x: math.sqrt(x))
 ]
 
