@@ -7,6 +7,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
 from kivy.graphics import Rectangle,Color,Translate,Line
+from kivy.clock import Clock
 from calc import calculations
 from calc.helpers import float_range,float_round
 
@@ -38,6 +39,7 @@ class GraphingCalc(Widget):
         self.graph_height = 410
         self.x_label_objects = None
         self.y_label_objects = None
+        self.graph_it_loop = None
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
         Window.bind(on_touch_up=self.graph_mouse_pos)
         Window.bind(on_touch_move=self.graph_move)
@@ -180,6 +182,12 @@ class GraphingCalc(Widget):
             self.initialise_graph()
             self.graph_it()
 
+    def pause_play(self):
+        if self.graph_it_loop == None:
+            self.graph_it_loop = Clock.schedule_interval(self.graph_it, 0.1)
+        else:
+            self.graph_it_loop.cancel()
+
     def generate_axes(self,pos,size,col):
         # Check axis won't go outside of canvas
         if pos[0] < 0 or pos[1] > self.graph_height:
@@ -188,6 +196,9 @@ class GraphingCalc(Widget):
             Color(*col)
             Rectangle(pos=pos,size=size)
             # Translate(xy=self.pos)
+
+    def graph_it_btn(self):
+        Clock.schedule_interval(self.graph_it, 1)
 
     def graph_it(self,ignore_lims=False):
         with self.graph.canvas:
@@ -209,12 +220,9 @@ class GraphingCalc(Widget):
                     x = var.step()
                     cur_anim_vars.append({"name":var.name_in.text,"val":x})
 
-            print("Anim var values: {}".format(cur_anim_vars))
-
             # Graph each function in function_inputs
             for func in self.function_inputs:
                 f_line = func[0].text
-                print("Starting f_line: {}".format(f_line))
                 func_col = self.colour_maps[func[1].text]
                 prev_x = None
                 prev_y = None
@@ -222,9 +230,7 @@ class GraphingCalc(Widget):
                 # Insert any anim vars
                 if self.anim_vars != []:
                     for var in cur_anim_vars:
-                        print("Anim var name: {}, value: {}".format(var["name"],var["val"]))
                         f_line = f_line.replace(var["name"], str(var["val"]))
-                        print("New f_line: {}".format(f_line))
 
                 for px_x in range(0, self.graph_width):
                     carte_x = self.px_to_carte(px_x, 0)[0]
@@ -292,8 +298,8 @@ class AnimVar(object):
             self.current = float(self.min_in.text)
 
         if self.current + float(self.step_in.text) > float(self.max_in.text):
-            self.current = float(self.max_in.text)
+            self.current = float(self.min_in.text)
         else:
             self.current += float(self.step_in.text)
-
+        print("Var at: {}".format(self.current))
         return self.current

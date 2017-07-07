@@ -76,7 +76,7 @@
                 text:"Standard mode"
 
     GridLayout:
-        cols:3
+        cols:4
         pos:(0,root.height-75)
         width:300
         height:30
@@ -91,6 +91,9 @@
         Button:
             text:"Add variable"
             on_press:root.add_anim_var()
+        Button:
+            text:"Pause/Play"
+            on_press:root.pause_play()
 
     ScrollView:
         height:root.height-40-90-20-30
