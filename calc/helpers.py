@@ -16,3 +16,11 @@ def nested_contains(tuple_list,lookup,i=0):
 
     return False
 
+def float_range(low,high,step):
+    i = low
+    while i < high:
+        yield i
+        i += step
+
+def float_round(x,nearest):
+    return round(x/nearest)*nearest

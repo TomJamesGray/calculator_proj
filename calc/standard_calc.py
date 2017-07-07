@@ -19,6 +19,7 @@ import re
 import math
 from functools import partial
 from calc import calculations
+from calc.helpers import float_range,float_round
 
 max_precision_out = 5
 logger = logging.getLogger(__name__)
@@ -153,10 +154,12 @@ class GraphingCalc(Widget):
         super().__init__(**kwargs)
         self.x_max = 5
         self.x_min = -5
-        self.x_step = 1
+        self.x_grid_step = 1
+        self.x_label_step = 1
         self.y_max = 5
         self.y_min = -5
-        self.y_step = 1
+        self.y_grid_step = 1
+        self.y_label_step = 1
         self.graph_width = 400
         self.graph_height = 410
         self.x_label_objects = None
@@ -191,12 +194,13 @@ class GraphingCalc(Widget):
             self.generate_axes(self.carte_to_px(self.x_min, 0), (400, 1), (0, 0, 0, 1))
 
             # Minor y axes
-            #TODO Don't use range to allow for decimal steps, etc
-            for i in range(int(self.x_min), int(self.x_max + self.x_step), int(self.x_step)):
+            for i in float_range(float_round(self.x_min,self.x_grid_step),
+                                 float_round(self.x_max + self.x_grid_step,self.x_grid_step), self.x_grid_step):
                 self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
 
             # Minor x axes
-            for i in range(int(self.y_min), int(self.y_max + self.y_step), int(self.y_step)):
+            for i in float_range(float_round(self.y_min, self.y_grid_step),
+                                 float_round(self.y_max + self.y_grid_step, self.y_grid_step), self.y_grid_step):
                 self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
 
             # If labels already exist remove them (incase limits have changed)
@@ -211,7 +215,7 @@ class GraphingCalc(Widget):
             self.y_label_objects = []
 
             # Add x labels
-            x_labels = list(range(int(self.x_min),int(self.x_max+self.x_step),int(self.x_step)))
+            x_labels = list(range(int(self.x_min),int(self.x_max+self.x_label_step),self.x_label_step))
             x_spacing = self.graph_width/len(x_labels)
 
             for i,lbl in enumerate(x_labels):
@@ -224,7 +228,7 @@ class GraphingCalc(Widget):
                 self.x_label_objects.append(a)
 
             # Add y labels
-            y_labels = list(range(int(self.y_min), int(self.y_max + self.y_step), int(self.y_step)))
+            y_labels = list(range(int(self.y_min), int(self.y_max + self.y_label_step), self.y_label_step))
             y_spacing = self.graph_height / len(y_labels)
 
             for i, lbl in enumerate(y_labels):
@@ -344,10 +348,10 @@ class GraphingCalc(Widget):
                             prev_x = None
                             prev_y = None
                             continue
-
-                        Line(points=[px_x,px_y, *self.carte_to_px(prev_x, prev_y)], width=1.01)
-                        prev_x = carte_x
-                        prev_y = carte_y
+                        else:
+                            Line(points=[px_x,px_y, *self.carte_to_px(prev_x, prev_y)], width=1.01)
+                            prev_x = carte_x
+                            prev_y = carte_y
                 Translate(xy=self.pos)
 
     def add_function(self):
