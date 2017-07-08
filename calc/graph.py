@@ -26,6 +26,7 @@ class GraphingCalc(Widget):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         logger.info("Initialising Graphing calc")
+        self.width = 900
         self.x_max = 5
         self.x_min = -5
         self.x_grid_step = 1
@@ -34,7 +35,7 @@ class GraphingCalc(Widget):
         self.y_min = -5
         self.y_grid_step = 1
         self.y_label_step = 1
-        self.graph_width = 400
+        self.graph_width = 600
         self.graph_height = 410
         self.x_label_objects = None
         self.y_label_objects = None
@@ -42,6 +43,7 @@ class GraphingCalc(Widget):
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
         Window.bind(on_touch_up=self.graph_mouse_pos)
         Window.bind(on_touch_move=self.graph_move)
+        Window.bind(on_resize=self.resize)
         self.function_inputs = [[self.function_input,self.function_colour_input]]
         self.anim_vars = []
         self.colour_maps = {
@@ -54,6 +56,19 @@ class GraphingCalc(Widget):
         self.initialise_graph()
         self.add_widget(self.graph)
 
+    def resize(self,*args):
+        print(args)
+        new_width = args[1]
+        self.width = new_width
+        new_height = args[2]
+        self.height = new_height
+
+        self.graph_width = new_width-300
+        self.graph_height = new_height-40
+        self.graph.width = self.graph_width
+        self.graph.height = self.graph_height
+        self.graph_it(True)
+
     def initialise_graph(self):
         """
         Initialises the graph layout, works if canvas is or isn't already populated. Also resets
@@ -61,23 +76,24 @@ class GraphingCalc(Widget):
         """
         with self.graph.canvas:
             Color(1,1,1,1)
+            print("Resizing graph new size: {}".format(self.graph.size))
             Rectangle(pos=(0,0),size=self.graph.size)
             Color(0,0,0,1)
             # Major Y axis
-            self.generate_axes(self.carte_to_px(0, self.y_min), (1, 410), (0, 0, 0, 1))
+            self.generate_axes(self.carte_to_px(0, self.y_min), (1, self.graph_height), (0, 0, 0, 1))
 
             # Major X axis
-            self.generate_axes(self.carte_to_px(self.x_min, 0), (400, 1), (0, 0, 0, 1))
+            self.generate_axes(self.carte_to_px(self.x_min, 0), (self.graph_width, 1), (0, 0, 0, 1))
 
             # Minor y axes
             for i in float_range(float_round(self.x_min,self.x_grid_step),
                                  float_round(self.x_max + self.x_grid_step,self.x_grid_step), self.x_grid_step):
-                self.generate_axes(self.carte_to_px(i, self.y_min), (1, 410), (.1, .1, .1, .4))
+                self.generate_axes(self.carte_to_px(i, self.y_min), (1, self.graph_height), (.1, .1, .1, .4))
 
             # Minor x axes
             for i in float_range(float_round(self.y_min, self.y_grid_step),
                                  float_round(self.y_max + self.y_grid_step, self.y_grid_step), self.y_grid_step):
-                self.generate_axes(self.carte_to_px(self.x_min, i), (400, 1), (.1, .1, .1, .4))
+                self.generate_axes(self.carte_to_px(self.x_min, i), (self.graph_width, 1), (.1, .1, .1, .4))
 
             # If labels already exist remove them (incase limits have changed)
             if self.x_label_objects != None:
@@ -262,7 +278,7 @@ class GraphingCalc(Widget):
                     for var in cur_anim_vars:
                         f_line = f_line.replace(var["name"], str(var["val"]))
 
-                for px_x in range(0, self.graph_width,1):
+                for px_x in range(0, self.graph_width,2):
                     set_none = False
                     # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]

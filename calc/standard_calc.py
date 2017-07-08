@@ -3,7 +3,7 @@ import logging
 import logging.config
 import types
 from kivy.config import Config
-Config.set('graphics','resizable',0)
+# Config.set('graphics','resizable',0)
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -163,9 +163,9 @@ class Calculator(Widget):
         Switch to the graphing mode
         :return:
         """
-        Window.size = (700,450)
+        Window.size = (900,450)
         self.clear_widgets()
-        self.add_widget(GraphingCalc(pos=(0,0),width=700,height=450))
+        self.add_widget(GraphingCalc(pos=(0,0),width=900,height=450))
 
     def clear_line(self):
         self.screen.text = ""
