@@ -255,15 +255,16 @@ class GraphingCalc(Widget):
             for func in self.function_inputs:
                 f_line = func[0].text
                 func_col = self.colour_maps[func[1].text]
-                prev_x = None
-                prev_y = None
-
+                points = []
+                cur_seg = []
                 # Insert any anim vars
                 if self.anim_vars != []:
                     for var in cur_anim_vars:
                         f_line = f_line.replace(var["name"], str(var["val"]))
 
-                for px_x in range(0, self.graph_width,2):
+                for px_x in range(0, self.graph_width,1):
+                    set_none = False
+                    # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]
                     try:
                         carte_y = calculations.parse_line(f_line.replace("x",str(carte_x)))
@@ -272,22 +273,38 @@ class GraphingCalc(Widget):
                         prev_y = None
                         continue
 
-                    if prev_x == None:
-                        prev_x = carte_x
-                        prev_y = carte_y
+                    px_x, px_y = self.carte_to_px(carte_x,carte_y)
+                    px_y = round(px_y)
+                    if px_y > self.graph_height:
+                        px_y = self.graph_height
+                        cur_seg.append(px_x)
+                        cur_seg.append(px_y)
+                        points.append(cur_seg)
+                        cur_seg = []
+                    elif px_y < 0:
+                        px_y = 0
+                        cur_seg.append(px_x)
+                        cur_seg.append(px_y)
+                        points.append(cur_seg)
+                        cur_seg = []
                     else:
-                        Color(*func_col)
-                        px_x,px_y = self.carte_to_px(carte_x,carte_y)
+                        if len(cur_seg) == 0:
+                            # If the cur_seg will just be a point, try and connect it to top/bottom of screen
+                            try:
+                                cur_seg.append(points[-1][0])
+                                cur_seg.append(points[-1][1])
+                            except IndexError:
+                                pass
 
-                        if px_y > self.graph_height or px_y < 0:
-                            # Point goes outside canvas so don't graph it and reset prev_x and prev_y
-                            prev_x = None
-                            prev_y = None
-                            continue
-                        else:
-                            Line(points=[px_x,px_y, *self.carte_to_px(prev_x, prev_y)], width=1.01)
-                            prev_x = carte_x
-                            prev_y = carte_y
+                        cur_seg.append(px_x)
+                        cur_seg.append(px_y)
+
+                points.append(cur_seg)
+                Color(*func_col)
+                for seg in points:
+                    Line(points=seg,width=1.01)
+
+
                 Translate(xy=self.pos)
 
     def add_function(self):
