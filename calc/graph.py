@@ -40,6 +40,7 @@ class GraphingCalc(Widget):
         self.x_label_objects = None
         self.y_label_objects = None
         self.graph_it_loop = None
+        self.cords = []
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
         Window.bind(on_touch_up=self.graph_mouse_pos)
         Window.bind(on_touch_move=self.graph_move)
@@ -188,6 +189,26 @@ class GraphingCalc(Widget):
                 zoom_factor = 1.05
             elif btn == "scrolldown":
                 zoom_factor = 0.95
+            elif btn == "left":
+                graph_x_px = x_px-self.graph.pos[0]
+                graph_y_px = y_px-self.graph.pos[1]
+                logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
+                # Loop through cords
+                for set in self.cords:
+                    current_min_delta = 6
+                    cur_optimum_point = None
+                    for i in range(0,len(set),2):
+                        x = set[i]
+                        y = set[i+1]
+                        delta = ((graph_x_px-x)**2+(graph_y_px-y)**2)**0.5
+                        if delta < 5 and delta < current_min_delta:
+                            cur_optimum_point = (x,y)
+                            #Within 5 px radius
+                            logger.info("New optimum point: {}".format(cur_optimum_point))
+
+
+                return True
+
             else:
                 return False
             self.x_max *= zoom_factor
@@ -246,6 +267,7 @@ class GraphingCalc(Widget):
         Clock.schedule_interval(self.graph_it, 1)
 
     def graph_it(self,reinitialse=False):
+        self.cords = []
         with self.graph.canvas:
             # if ignore_lims:
             #     # Update x,y maxes and mins and step
@@ -271,6 +293,7 @@ class GraphingCalc(Widget):
             for func in self.function_inputs:
                 f_line = func[0].text
                 func_col = self.colour_maps[func[1].text]
+                func_cords = []
                 points = []
                 cur_seg = []
                 # Insert any anim vars
@@ -318,7 +341,10 @@ class GraphingCalc(Widget):
                 points.append(cur_seg)
                 Color(*func_col)
                 for seg in points:
+                    [func_cords.append(x) for x in seg]
                     Line(points=seg,width=1.01)
+
+                self.cords.append(func_cords)
 
 
                 Translate(xy=self.pos)
