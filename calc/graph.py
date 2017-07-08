@@ -57,11 +57,11 @@ class GraphingCalc(Widget):
         self.add_widget(self.graph)
 
     def resize(self,*args):
-        print(args)
         new_width = args[1]
         self.width = new_width
         new_height = args[2]
         self.height = new_height
+        logger.info("Resizing graphing calc, new width: {}, new_height: {}".format(new_width,new_height))
 
         self.graph_width = new_width-300
         self.graph_height = new_height-40
@@ -76,7 +76,6 @@ class GraphingCalc(Widget):
         """
         with self.graph.canvas:
             Color(1,1,1,1)
-            print("Resizing graph new size: {}".format(self.graph.size))
             Rectangle(pos=(0,0),size=self.graph.size)
             Color(0,0,0,1)
             # Major Y axis
