@@ -1,3 +1,4 @@
+import logging
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
@@ -10,6 +11,8 @@ from kivy.graphics import Rectangle,Color,Translate,Line
 from kivy.clock import Clock
 from calc import calculations
 from calc.helpers import float_range,float_round
+
+
 
 class ColourSpinner(Spinner):
     pass
@@ -27,6 +30,8 @@ class GraphingCalc(Widget):
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        logger = logging.getLogger(__name__)
+        logger.debug("Initialising graph calc")
         self.x_max = 5
         self.x_min = -5
         self.x_grid_step = 1

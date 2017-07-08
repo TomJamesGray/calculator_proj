@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import logging.config
 import types
 from kivy.config import Config
 Config.set('graphics','resizable',0)
@@ -22,13 +23,48 @@ from calc import calculations
 from calc.helpers import float_range,float_round
 from calc.graph import GraphingCalc
 
-max_precision_out = 5
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "main": {"format": "%(levelname)s-%(name)s-%(lineno)d: %(message)s"}
+    },
+    "handlers": {
+        "calculations": {
+            "class": "logging.StreamHandler",
+            "formatter": "main",
+            "level": logging.INFO},
+        "gui": {
+            "class": "logging.StreamHandler",
+            "formatter": "main",
+            "level": logging.INFO}
+    },
+    "loggers": {
+        "calc.standard_calc": {
+            "handlers": ["calculations"],
+            "level": logging.INFO},
+        "calc.graph": {
+            "handlers": ["gui"],
+            "level": logging.INFO
+        }
+    }
+}
+print("Setting up logging")
+logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
+
+max_precision_out = 5
+
 
 class Calculator(Widget):
     global max_precision_out
     screen = ObjectProperty(None)
+
     def __init__(self, columns=5,**kwargs):
+        print("Calcualtor logger: {}".format(logger))
+        print(logger.getEffectiveLevel())
+        logger.warning("Boo")
+        logger.info("TEST INFO")
         super(Calculator,self).__init__(**kwargs)
         #Define buttons and their functions/strings to be implemented
         #on press

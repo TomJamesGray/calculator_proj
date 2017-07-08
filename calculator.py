@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from calc.standard_calc import main
+import calc.standard_calc
 
 if __name__ == "__main__":
-    main()
+    calc.standard_calc.main()
