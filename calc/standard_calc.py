@@ -44,7 +44,7 @@ logging_config = {
             "handlers": ["calculations"],
             "level": logging.INFO},
         "calc.graph": {
-            "handlers": ["gui"],
+            "handlers": ["calculations"],
             "level": logging.INFO
         }
     }
@@ -61,10 +61,6 @@ class Calculator(Widget):
     screen = ObjectProperty(None)
 
     def __init__(self, columns=5,**kwargs):
-        print("Calcualtor logger: {}".format(logger))
-        print(logger.getEffectiveLevel())
-        logger.warning("Boo")
-        logger.info("TEST INFO")
         super(Calculator,self).__init__(**kwargs)
         #Define buttons and their functions/strings to be implemented
         #on press

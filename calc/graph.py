@@ -12,7 +12,7 @@ from kivy.clock import Clock
 from calc import calculations
 from calc.helpers import float_range,float_round
 
-
+logger = logging.getLogger(__name__)
 
 class ColourSpinner(Spinner):
     pass
@@ -30,8 +30,7 @@ class GraphingCalc(Widget):
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        logger = logging.getLogger(__name__)
-        logger.debug("Initialising graph calc")
+        logger.info("Initialising Graphing calc")
         self.x_max = 5
         self.x_min = -5
         self.x_grid_step = 1
@@ -191,11 +190,13 @@ class GraphingCalc(Widget):
         if self.graph_it_loop == None:
             # Start animated vars
             if self.anim_vars != []:
+                logger.info("Enabling animated variables")
                 for var in self.anim_vars:
                     var.disabled = False
                 self.graph_it_loop = Clock.schedule_interval(self.graph_it, 0.1)
-            btn.text = "Pause"
+                btn.text = "Pause"
         else:
+            logger.info("Disabling animated variables")
             # Stop animated vars
             self.graph_it_loop.cancel()
             # Disable all anim vars
