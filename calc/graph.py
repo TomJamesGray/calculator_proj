@@ -258,6 +258,7 @@ class GraphingCalc(Widget):
             #     # Re-initialise graph
             #     self.initialise_graph()
             if reinitialse:
+                self.graph.canvas.clear()
                 self.initialise_graph()
             # Step over any anim_vars
             cur_anim_vars = []
