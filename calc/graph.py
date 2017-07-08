@@ -5,6 +5,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.spinner import Spinner
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
 from kivy.graphics import Rectangle,Color,Translate,Line
@@ -21,12 +22,6 @@ class GraphingCalc(Widget):
     function_input = ObjectProperty(None)
     function_colour_input = ObjectProperty(None)
     function_grid = ObjectProperty(None)
-    max_x_input = ObjectProperty(None)
-    min_x_input = ObjectProperty(None)
-    max_y_input = ObjectProperty(None)
-    min_y_input = ObjectProperty(None)
-    x_step_input = ObjectProperty(None)
-    y_step_input = ObjectProperty(None)
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -160,7 +155,7 @@ class GraphingCalc(Widget):
         self.x_min = self.x_min + dx_carte
         self.x_max = self.x_max + dx_carte
         # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
-        self.update_lims_inputs()
+        # self.update_lims()
         self.initialise_graph()
         self.graph_it()
 
@@ -184,21 +179,24 @@ class GraphingCalc(Widget):
             self.x_min *= zoom_factor
             self.y_max *= zoom_factor
             self.y_min *= zoom_factor
-            self.update_lims_inputs()
+            # self.update_lims()
             self.initialise_graph()
             self.graph_it()
 
-    def update_lims_inputs(self):
+    def update_lims(self,x_min,x_max,y_min,y_max,x_step,y_step):
         """
         Updates the values for the min, max and step text inputs for x and y
         """
-        self.min_x_input.text = str(round(self.x_min,3))
-        self.max_x_input.text = str(round(self.x_max,3))
-        self.min_y_input.text = str(round(self.y_min,3))
-        self.max_y_input.text = str(round(self.y_max,3))
-        self.x_step_input.text = str(round(self.x_grid_step,3))
-        self.y_step_input.text = str(round(self.y_grid_step,3))
-
+        # self.a.dismiss()
+        # logger.info("I")
+        self.x_min = float(x_min)
+        self.x_max = float(x_max)
+        self.y_min = float(y_min)
+        self.y_max = float(y_max)
+        self.x_grid_step = float(x_step)
+        self.y_grid_step = float(y_step)
+        self.initialise_graph()
+        self.graph_it()
 
     def pause_play(self,btn):
         if self.graph_it_loop == None:
@@ -322,6 +320,31 @@ class GraphingCalc(Widget):
         container.add_widget(step)
 
         self.function_grid.add_widget(container)
+
+    def adjust_axes_btn(self):
+        LimitsPopup(self).open()
+        # self.a = x
+
+class LimitsPopup(Popup):
+    max_x_input = ObjectProperty(None)
+    min_x_input = ObjectProperty(None)
+    max_y_input = ObjectProperty(None)
+    min_y_input = ObjectProperty(None)
+    x_step_input = ObjectProperty(None)
+    y_step_input = ObjectProperty(None)
+
+    def __init__(self,graph,**kwargs):
+        super(LimitsPopup,self).__init__(**kwargs)
+        self.graph = graph
+
+    def update(self):
+        logger.info("Updating limits from popup")
+        # self.dismiss()
+        # self.dismiss()
+        self.dismiss()
+        self.graph.update_lims(self.min_x_input.text, self.max_x_input.text, self.min_y_input.text,
+                                self.max_y_input.text, self.x_step_input.text, self.y_step_input.text)
+
 
 class AnimVar(object):
     def __init__(self,name_in,min_in,max_in,step_in):
