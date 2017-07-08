@@ -160,6 +160,7 @@ class GraphingCalc(Widget):
         self.x_min = self.x_min + dx_carte
         self.x_max = self.x_max + dx_carte
         # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
+        self.update_lims_inputs()
         self.initialise_graph()
         self.graph_it()
 
@@ -183,8 +184,21 @@ class GraphingCalc(Widget):
             self.x_min *= zoom_factor
             self.y_max *= zoom_factor
             self.y_min *= zoom_factor
+            self.update_lims_inputs()
             self.initialise_graph()
             self.graph_it()
+
+    def update_lims_inputs(self):
+        """
+        Updates the values for the min, max and step text inputs for x and y
+        """
+        self.min_x_input.text = str(round(self.x_min,3))
+        self.max_x_input.text = str(round(self.x_max,3))
+        self.min_y_input.text = str(round(self.y_min,3))
+        self.max_y_input.text = str(round(self.y_max,3))
+        self.x_step_input.text = str(round(self.x_grid_step,3))
+        self.y_step_input.text = str(round(self.y_grid_step,3))
+
 
     def pause_play(self,btn):
         if self.graph_it_loop == None:
