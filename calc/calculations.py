@@ -6,12 +6,13 @@ from calc.helpers import nested_in,nested_contains
 #Define the special functions with lambdas
 #and convert from degrees to radians
 special_functions = [
-    ('sin', lambda x: math.sin(math.radians(x))),
-    ('cos', lambda x: math.cos(math.radians(x))),
-    ('tan', lambda x: math.tan(math.radians(x))),
+    ('sin', lambda x: math.sin(x)),
+    ('cos', lambda x: math.cos(x)),
+    ('tan', lambda x: math.tan(x)),
     ('sqrt',lambda x: math.sqrt(x))
 ]
 
+logger = logging.getLogger(__name__)
 def parse_line(calc_line,prev_ans=None,**kwargs):
     """
     Parses the line from the calculator screen, and replaces ANS with
@@ -24,7 +25,7 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
         """Handle the use of special_functions recursively
         """
         arg_str = ""
-        logging.debug("arg_list: {}".format(arg_list))
+        logger.debug("arg_list: {}".format(arg_list))
         #Go through arg_list and recall parse_special_funcif there's nested
         #sin's
         for i,elem in enumerate(arg_list):
@@ -32,14 +33,14 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
                 recieved_ans = parse_special_func(arg_list[i:])
                 arg_str = arg_list[i-1] + recieved_ans
 
-        logging.debug("arg_str {}".format(arg_str))
+        logger.debug("arg_str {}".format(arg_str))
         #Get function required from special_functions
         func = nested_in(special_functions,arg_list[0])[1]
         if arg_str != "":
             ans = str(func(eval(arg_str)))
         else:
             ans = str(func(eval("".join(arg_list[2:]))))
-        logging.debug("ans for sin is {}".format(ans))
+        logger.debug("ans for sin is {}".format(ans))
         return ans
 
 
@@ -57,7 +58,7 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
     split_calc_line = re.split(r'(sin|cos|tan|\)|\()',calc_line)
     #Strip list of blank elems
     split_calc_line = list(filter(None,split_calc_line))
-    logging.debug("Split_calc_line after regex: {}".format(split_calc_line))
+    logger.debug("Split_calc_line after regex: {}".format(split_calc_line))
 
     parsed_calc_line = []
     parsed = False
@@ -91,11 +92,11 @@ def parse_line(calc_line,prev_ans=None,**kwargs):
             i += 1
 
 
-    logging.debug("Parsed line to eval: {}".format(parsed_calc_line))
+    logger.debug("Parsed line to eval: {}".format(parsed_calc_line))
     try:
         ans = eval("".join(parsed_calc_line))
     except ZeroDivisionError as e:
-        logging.error("Tried to divide by zero")
+        logger.error("Tried to divide by zero")
         raise(e)
 
     return ans

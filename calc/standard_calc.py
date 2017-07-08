@@ -1,21 +1,70 @@
 #!/usr/bin/env python3
-import tkinter as tk
-from tkinter import font
 import logging
+import logging.config
 import types
+from kivy.config import Config
+# Config.set('graphics','resizable',0)
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.spinner import Spinner
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.core.window import Window
+from kivy.properties import ObjectProperty
+from kivy.graphics import Rectangle,Color,Translate,Line
 import re
 import math
 from functools import partial
 from calc import calculations
+from calc.helpers import float_range,float_round
+from calc.graph import GraphingCalc
+
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "main": {"format": "%(levelname)s-%(name)s-%(lineno)d: %(message)s"}
+    },
+    "handlers": {
+        "calculations": {
+            "class": "logging.StreamHandler",
+            "formatter": "main",
+            "level": logging.INFO},
+        "gui": {
+            "class": "logging.StreamHandler",
+            "formatter": "main",
+            "level": logging.INFO}
+    },
+    "loggers": {
+        "calc.standard_calc": {
+            "handlers": ["calculations"],
+            "level": logging.INFO},
+        "calc.graph": {
+            "handlers": ["calculations"],
+            "level": logging.INFO
+        }
+    }
+}
+print("Setting up logging")
+logging.config.dictConfig(logging_config)
+logger = logging.getLogger(__name__)
 
 max_precision_out = 5
 
-class App:
+
+class Calculator(Widget):
     global max_precision_out
-    def __init__(self, master, columns=5):
+    screen = ObjectProperty(None)
+
+    def __init__(self, columns=5,**kwargs):
+        super(Calculator,self).__init__(**kwargs)
         #Define buttons and their functions/strings to be implemented
         #on press
-        buttons = [
+        self.buttons = [
             ('1/x',('1/ANS', lambda: self.handle_parse_line())),
             ('+/-',('-1*ANS', lambda: self.handle_parse_line())),
             ('√','sqrt('),
@@ -51,87 +100,83 @@ class App:
         self.clear_on_next_button = False
         self.prev_ans = None
         
-        # Make frame, child of master
-        f = tk.Frame(master)
-        #Initialize grid to 40px wide columns
-        for column in range(columns):
-            f.columnconfigure(column)
+        container = Widget()
+        grid = GridLayout(size=(350,300),pos=(0,0),rows=6,cols=5)
+        for i,button in enumerate(self.buttons):
+            grid.add_widget(Button(text=button[0],on_press=self.button_handler,id=str(i)))
 
-        #Create entry box to display the sum for the calculator, the sticky
-        #option streches the textbox horizontally to use up all the space available
-        self.calc_screen = tk.Entry(f,font=font.Font(size=16,family="Arial"))
-        self.calc_screen.grid(column=0,row=0,columnspan=columns,sticky=tk.E+tk.W)
+        container.add_widget(grid)
+        self.add_widget(container)
 
-        self.calc_answer_screen = tk.Label(f,justify='left')
-        self.calc_answer_screen.grid(column=0,row=1,columnspan=columns,
-                sticky=tk.E+tk.W)
-        #Initialise variables for loop for button grid
-        row, column = 2, 0
-        
-        # Loop through buttons and create button
-        # with the command which will then be appended to the
-        # "command line", with the exception of functions
-        for button,button_inf in buttons:
-            tk.Button(f,text=button,width=3,
-                    relief=tk.GROOVE,overrelief=tk.GROOVE,
-                    command=partial(self.button_handler,button_inf)).grid(
-                            column=column,row=row)
-            
-            logging.info("Button: {} at row {} col {}".format(button,row,column))
-            #Create a new row if needed
-            if column == columns - 1:
-                logging.info("Creating new row at: {}".format(button))
-                row += 1
-                column = 0
-            else:
-                column += 1
-        f.pack() 
-    def button_handler(self,buttonFunction):
+    def button_handler(self,button_instance):
         """
         Handles all button presses and either runs the
         function if the button is assigned to a function or class method
         or append the string or int to the calculator screen.
         """
-        def handle_individual_func(buttonFunction):
-            if isinstance(buttonFunction, types.MethodType) or \
-                isinstance(buttonFunction, types.FunctionType):
-                buttonFunction()
+        button_function = self.buttons[int(button_instance.id)][1]
+        # print(buttonFunction())
+        def handle_individual_func(button_function):
+            if isinstance(button_function, types.MethodType) or \
+                isinstance(button_function, types.FunctionType):
+                button_function()
             else:
                 #Only clear_on_next_button if the button isn't a function
                 #this means the ANS can be incremented just by pressing '='
                 if self.clear_on_next_button:
                     #Clear calc_screen
-                    self.calc_screen.delete(0,'end')
+                    self.screen.text = ""
                     #Reset clear_on_next_button now
                     self.clear_on_next_button = False
                 
-                self.calc_screen.insert(tk.END,buttonFunction)
+
+                print("Button {} pressed".format(button_function))
+                print(self.screen)
+                self.screen.insert_text(str(button_function))
         
-        if isinstance(buttonFunction,tuple):
-            for f in buttonFunction:
+        if isinstance(button_function,tuple):
+            for f in button_function:
                 handle_individual_func(f)
         else:
-            handle_individual_func(buttonFunction)
+            handle_individual_func(button_function)
 
 
     def handle_parse_line(self):
         """Call parse_line, but set class specific attributes
         """
         if self.prev_ans != None:
-            self.prev_ans = self.calc_answer_screen['text']
+            self.prev_ans = self.screen.text
         try:
             ans = round(calculations.parse_line(
-                    self.calc_screen.get(),self.prev_ans),max_precision_out)
+                    self.screen.text,self.prev_ans),max_precision_out)
             self.prev_ans = ans
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             ans = "Error"
             self.prev_ans = None
 
-        self.calc_answer_screen['text'] = ans
+        self.screen.text= str(ans)
         self.clear_on_next_button = True
         
+    def graph_mode(self):
+        """
+        Switch to the graphing mode
+        :return:
+        """
+        Window.size = (900,450)
+        self.clear_widgets()
+        self.add_widget(GraphingCalc(pos=(0,0),width=900,height=450))
 
     def clear_line(self):
-        self.calc_screen.delete(0,'end')
+        self.screen.text = ""
 
+
+class CalculatorApp(App):
+    def build(self):
+        self.title = "Calculator"
+        Window.size=(350,450)
+        calc = Calculator()
+        return calc
+
+def main():
+    CalculatorApp().run()

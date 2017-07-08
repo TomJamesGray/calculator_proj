@@ -1,0 +1,212 @@
+#:import Factory kivy.factory.Factory
+
+<Calculator>
+    screen:screen
+    ActionBar:
+        width:root.width
+        size_hint_x:1
+        height:40
+        pos:0,root.height-self.height
+        ActionView:
+            use_seperator:True
+            ActionPrevious:
+                with_previous:False
+                size_hint_x:None
+                width:0
+                app_icon_width:1
+                app_icon_height:0
+            ActionButton:
+                on_press:root.graph_mode()
+                text:"Graphing Mode"
+
+    TextInput:
+        id:screen
+        multiline:False
+        pos:5,330
+        size:390,60
+        background_color:0.1,0.1,0.1,1
+        foreground_color:1,1,1,1
+        cursor_color:0.8,0.8,0.8,1
+        font_size:25
+
+<ColourSpinnerOption@SpinnerOption>
+    font_size:"12sp"
+    height:20
+    background_normal:""
+    background_color:(1,1,1,1)
+    color:(0,0,0,1)
+
+<ColourSpinner>
+    text:"Colour"
+    values:["Black","Red","Blue"]
+    sync_height:True
+#    height:20
+    font_size:"12sp"
+    background_color:(1,1,1,1)
+    background_normal:""
+    color:(0,0,0,1)
+    option_cls:Factory.get("ColourSpinnerOption")
+
+<LimitsPopup>
+    max_x_input:max_x_input
+    min_x_input:min_x_input
+    max_y_input:max_y_input
+    min_y_input:min_y_input
+    x_step_input:x_step_input
+    y_step_input:y_step_input
+    title:"Adjust axes"
+    size:(350,220)
+    size_hint:(None,None)
+    auto_dismiss:False
+    BoxLayout:
+        orientation:"vertical"
+        GridLayout:
+            width:300
+#            size_hint:(None,None)
+#            size_hint_y:None
+            row_default_height:30
+            row_force_default:True
+            cols:4
+            Label:
+                text:"Max X"
+                font_size:"10sp"
+                halign:"center"
+            TextInput:
+                write_tab:False
+                text:"5"
+                id:max_x_input
+            Label:
+                text:"Min X"
+                font_size:"10sp"
+                halign:"center"
+                write_tab:False
+            TextInput:
+                write_tab:False
+                text:"-5"
+                id:min_x_input
+            Label:
+                text:"Max Y"
+                font_size:"10sp"
+                halign:"center"
+                write_tab:False
+            TextInput:
+                write_tab:False
+                text:"5"
+                id:max_y_input
+            Label:
+                text:"Min Y"
+                font_size:"10sp"
+                halign:"center"
+                write_tab:False
+            TextInput:
+                write_tab:False
+                text:"-5"
+                id:min_y_input
+            Label:
+                text:"X Step"
+                font_size:"10sp"
+                halign:"center"
+                write_tab:False
+            TextInput:
+                write_tab:False
+                text:"1"
+                id:x_step_input
+            Label:
+                text:"Y Step"
+                font_size:"10sp"
+                halign:"center"
+                write_tab:False
+            TextInput:
+                write_tab:False
+                text:"1"
+                id:y_step_input
+        Button:
+            size_hint_y:None
+            height:50
+            text:"Update graph"
+#            on_press:root.update()
+            on_release:root.update()
+
+<GraphingCalc>
+    function_input:function_input
+    function_colour_input:function_colour_input
+    function_grid:function_grid
+
+
+    ActionBar:
+        width:root.width
+        size_hint_x:1
+        height:40
+        pos:0,root.height-self.height
+        ActionView:
+            use_seperator:True
+            ActionPrevious:
+                with_previous:False
+                size_hint_x:None
+                width:0
+                app_icon_width:1
+                app_icon_height:0
+            ActionButton:
+                on_press:root.graph_mode()
+                text:"Standard mode"
+
+    GridLayout:
+        cols:3
+        pos:(0,root.height-105)
+        width:300
+        height:60
+        row_default_height:30
+        row_force_default:True
+        Button:
+            text:"Plot it"
+            on_press:root.graph_it()
+        Button:
+            text:"Add function"
+            on_press:root.add_function()
+        Button:
+            text:"Add variable"
+            on_press:root.add_anim_var()
+        Button:
+            text:"Play"
+            on_press:root.pause_play(self)
+        Button:
+            text:"Adjust axes"
+            on_press:root.adjust_axes_btn()
+
+    ScrollView:
+        height:root.height-40-60
+        width:300
+        pos:(0,0)
+        size_hint:(1,None)
+        GridLayout:
+            id:function_grid
+            width:300
+            size_hint_y:None
+            pos:(0,root.height-40)
+            padding:0,10
+            spacing:5,5
+            height:self.minimum_height
+            cols:1
+            row_default_height:30
+#            row_force_default:True
+#            cols_minimum:{0:45,1:145,2:95}
+            GridLayout:
+#                padding:0,10
+                spacing:5,5
+                row_default_height:30
+                width:300
+                row_force_default:True
+                cols_minimum:{0:45,1:145,2:95}
+                cols:3
+                Label:
+                    text:"y = "
+                TextInput:
+                    id:function_input
+                ColourSpinner:
+                    id:function_colour_input
+
+
+
+
+
+
