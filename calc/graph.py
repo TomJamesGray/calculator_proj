@@ -203,7 +203,7 @@ class GraphingCalc(Widget):
                 zoom_factor = 1.05
             elif btn == "scrolldown":
                 zoom_factor = 0.95
-            elif btn == "left" and self.graph_it_loop == None:
+            elif btn == "left":
                 # Don't plot points if graph is currently playing with anim vars
                 graph_x_px = x_px-self.graph.pos[0]
                 graph_y_px = y_px-self.graph.pos[1]
@@ -262,7 +262,7 @@ class GraphingCalc(Widget):
                 logger.info("Enabling animated variables")
                 for var in self.anim_vars:
                     var.disabled = False
-                self.graph_it_loop = Clock.schedule_interval(self.graph_it, 0.1)
+                self.graph_it_loop = Clock.schedule_interval(lambda x: self.graph_it(True,True), 0.1)
                 btn.text = "Pause"
         else:
             logger.info("Disabling animated variables")
@@ -300,6 +300,8 @@ class GraphingCalc(Widget):
             for var in self.anim_vars:
                 if step:
                     x = var.step()
+                else:
+                    x = var.current
                 cur_anim_vars.append({"name": var.name_in.text, "val": x})
 
         # Insert any anim vars
@@ -310,22 +312,15 @@ class GraphingCalc(Widget):
         return f_line
 
 
-    def graph_it(self,reinitialse=False):
+    def graph_it(self,reinitialse=False,update_point_show=False):
         self.cords = []
         with self.graph.canvas:
-            # if ignore_lims:
-            #     # Update x,y maxes and mins and step
-            #     self.x_min = float(self.min_x_input.text)
-            #     self.x_max = float(self.max_x_input.text)
-            #     self.y_min = float(self.min_y_input.text)
-            #     self.y_max = float(self.max_y_input.text)
-            #     self.x_step = float(self.x_step_input.text)
-            #     self.y_step = float(self.y_step_input.text)
-            #     # Re-initialise graph
-            #     self.initialise_graph()
             if reinitialse:
                 self.graph.canvas.clear()
                 self.initialise_graph()
+            if update_point_show and self.point_show != None:
+                logger.info("Updating point show")
+                self.point_show.update()
 
             # Graph each function in function_inputs
             for func in self.function_inputs:
@@ -442,6 +437,8 @@ class ShowPoint(Widget):
     def __init__(self,graph,point_px,func_line,**kwargs):
         self.graph = graph
         self.func_line = func_line
+        self.x_px = point_px[0]
+        logger.info("Initial x_px: {}".format(self.x_px))
         super(ShowPoint,self).__init__(**kwargs)
         with self.canvas:
             Color(213 / 255, 78 / 255, 160 / 255, 1)
@@ -464,7 +461,11 @@ class ShowPoint(Widget):
         """
         logger.info("Moving x to x_px (on canvas) to {}:".format(x))
         new_x_carte = self.graph.px_to_carte(x,0)[0]
-        new_y_carte = calculations.parse_line(self.func_line.replace("x",str(new_x_carte)))
+
+        # Insert any anim vars wihout stepping over them and replace x
+        f_line_evaluate = self.graph.insert_anim_vars(self.func_line.replace("x", str(new_x_carte)), False)
+        new_y_carte = calculations.parse_line(f_line_evaluate)
+
         logger.info("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
         x_px,y_px = self.graph.carte_to_px(new_x_carte,new_y_carte)
 
@@ -472,6 +473,9 @@ class ShowPoint(Widget):
         self.lbl.text = "({}, {})".format(round(new_x_carte,2),round(new_y_carte,2))
         self.lbl.pos = (x_px+300,y_px)
 
+    def update(self):
+        logger.info("Updating point show at x={}".format(self.x_px))
+        self.move_x(self.x_px)
 
 
 class AnimVar(object):
