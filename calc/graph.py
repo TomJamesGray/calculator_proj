@@ -203,7 +203,8 @@ class GraphingCalc(Widget):
                 zoom_factor = 1.05
             elif btn == "scrolldown":
                 zoom_factor = 0.95
-            elif btn == "left":
+            elif btn == "left" and self.graph_it_loop == None:
+                # Don't plot points if graph is currently playing with anim vars
                 graph_x_px = x_px-self.graph.pos[0]
                 graph_y_px = y_px-self.graph.pos[1]
                 logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
@@ -286,6 +287,29 @@ class GraphingCalc(Widget):
     def graph_it_btn(self):
         Clock.schedule_interval(self.graph_it, 1)
 
+    def insert_anim_vars(self,f_line,step=True):
+        """
+        Inserts and by default steps over any anim vars
+        :param f_line: The function line to be modified and evaluated
+        :param step: Whether to step over the anim vars, defaults to True
+        :return: Modified function line with anim vars
+        """
+        # Step over any anim_vars
+        cur_anim_vars = []
+        if self.anim_vars != []:
+            for var in self.anim_vars:
+                if step:
+                    x = var.step()
+                cur_anim_vars.append({"name": var.name_in.text, "val": x})
+
+        # Insert any anim vars
+        if self.anim_vars != []:
+            for var in cur_anim_vars:
+                f_line = f_line.replace(var["name"], str(var["val"]))
+
+        return f_line
+
+
     def graph_it(self,reinitialse=False):
         self.cords = []
         with self.graph.canvas:
@@ -302,24 +326,14 @@ class GraphingCalc(Widget):
             if reinitialse:
                 self.graph.canvas.clear()
                 self.initialise_graph()
-            # Step over any anim_vars
-            cur_anim_vars = []
-            if self.anim_vars != []:
-                for var in self.anim_vars:
-                    x = var.step()
-                    cur_anim_vars.append({"name":var.name_in.text,"val":x})
 
             # Graph each function in function_inputs
             for func in self.function_inputs:
-                f_line = func[0].text
+                f_line = self.insert_anim_vars(func[0].text)
                 func_col = self.colour_maps[func[1].text]
                 func_cords = []
                 points = []
                 cur_seg = []
-                # Insert any anim vars
-                if self.anim_vars != []:
-                    for var in cur_anim_vars:
-                        f_line = f_line.replace(var["name"], str(var["val"]))
 
                 for px_x in range(0, self.graph_width,1):
                     set_none = False
