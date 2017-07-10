@@ -165,14 +165,9 @@ class GraphingCalc(Widget):
         btn = args[1].button
         if btn == "left" and isinstance(self.point_show,ShowPoint):
             # Move point show
-            logger.info("Moving co-ordinate point")
             x_px = args[1].x-self.graph.pos[0]
-            y_px = args[1].y-self.graph.pos[1]
-            carte_x,carte_y = self.px_to_carte(x_px,y_px)
-
-            self.point_show[0].pos = (x_px, y_px)
-            self.point_show[1].pos = (x_px,y_px)
-            self.point_show[1].text = "({}, {})".format(round(carte_x,2),round(carte_y,2))
+            logger.info("Moving co-ordinate point to x px = {} on graph".format(x_px))
+            self.point_show.move_x(x_px)
         else:
             dx = -int(args[1].dx)
             dy = -int(args[1].dy)
@@ -190,8 +185,9 @@ class GraphingCalc(Widget):
             self.graph_it()
 
     def remove_point_show(self,*args):
-        # self.point_show = None
-        pass
+        if self.point_show != None:
+            self.point_show.clear_widgets()
+            self.point_show = None
 
     def graph_mouse_pos(self,*args):
         """
@@ -227,6 +223,7 @@ class GraphingCalc(Widget):
                 if cur_optimum_point != None:
                     # TODO: Actually use function for set
                     self.point_show = ShowPoint(self,cur_optimum_point,"sin(x)")
+                    self.add_widget(self.point_show)
 
                 return True
             else:
@@ -435,19 +432,29 @@ class ShowPoint(Widget):
             # Line(circle=(cur_optimum_point[0],cur_optimum_point[1],3))
             point_x = point_px[0] - 5
             point_y = point_px[1] - 5
-            carte_x, carte_y = self.px_to_carte(*cur_optimum_point)
-            self.point = Ellipse(pos=(point_x, point_y), size=(10, 10))
+            carte_x, carte_y = self.graph.px_to_carte(*point_px)
+
+            abs_point_x = point_x + 300
+            abs_point_y = point_y
+
+            self.point = Ellipse(pos=(abs_point_x, abs_point_y), size=(10, 10))
             self.lbl = Label(text="({}, {})".format(round(carte_x, 2), round(carte_y, 2)),
-                        pos=(cur_optimum_point[0], cur_optimum_point[1]), color=(0, 0, 0, 1), height=20)
+                        pos=(abs_point_x,abs_point_y), color=(0, 0, 0, 1), height=20)
 
     def move_x(self,x):
+        """
+        Moves the position of the show point widget on the graph
+        :param x: The x value of the co-ordinates of the new point on the graph
+        """
+        logger.info("Moving x to x_px (on canvas) to {}:".format(x))
         new_x_carte = self.graph.px_to_carte(x,0)[0]
-        new_y_carte = calculations.parse_line(self.func_line.replace("x",x))
+        new_y_carte = calculations.parse_line(self.func_line.replace("x",str(new_x_carte)))
+        logger.info("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
         x_px,y_px = self.graph.carte_to_px(new_x_carte,new_y_carte)
 
-        self.point.pos = (x_px-5,y_px-5)
+        self.point.pos = (x_px-5+300,y_px-5)
         self.lbl.text = "({}, {})".format(round(new_x_carte,2),round(new_y_carte,2))
-        self.lbl.pos = (x_px,y_px)
+        self.lbl.pos = (x_px+300,y_px)
 
 
 
