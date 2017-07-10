@@ -208,21 +208,23 @@ class GraphingCalc(Widget):
                 graph_y_px = y_px-self.graph.pos[1]
                 logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
                 # Loop through cords
-                for set in self.cords:
-                    current_min_delta = 6
-                    cur_optimum_point = None
+                cur_min_delta = 6
+                cur_optimum_point = None
+                cur_function = None
+                for f_no,set in enumerate(self.cords):
                     for i in range(0,len(set),2):
                         x = set[i]
                         y = set[i+1]
                         delta = ((graph_x_px-x)**2+(graph_y_px-y)**2)**0.5
-                        if delta < 5 and delta < current_min_delta:
+                        if delta < 5 and delta < cur_min_delta:
                             cur_optimum_point = (x,y)
+                            cur_min_delta = delta
+                            cur_function = f_no
                             #Within 5 px radius
                             logger.info("New optimum point: {}".format(cur_optimum_point))
 
                 if cur_optimum_point != None:
-                    # TODO: Actually use function for set
-                    self.point_show = ShowPoint(self,cur_optimum_point,"sin(x)")
+                    self.point_show = ShowPoint(self,cur_optimum_point,self.function_inputs[cur_function][0].text)
                     self.add_widget(self.point_show)
 
                 return True
