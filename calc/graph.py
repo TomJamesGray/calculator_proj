@@ -186,7 +186,7 @@ class GraphingCalc(Widget):
 
     def remove_point_show(self,*args):
         if self.point_show != None:
-            self.point_show.clear_widgets()
+            self.remove_widget(self.point_show)
             self.point_show = None
 
     def graph_mouse_pos(self,*args):
