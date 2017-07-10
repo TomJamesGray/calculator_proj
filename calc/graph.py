@@ -8,7 +8,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty
-from kivy.graphics import Rectangle,Color,Translate,Line
+from kivy.graphics import Rectangle,Color,Translate,Ellipse,Line
 from kivy.clock import Clock
 from calc import calculations
 from calc.helpers import float_range,float_round
@@ -40,9 +40,11 @@ class GraphingCalc(Widget):
         self.x_label_objects = None
         self.y_label_objects = None
         self.graph_it_loop = None
+        self.point_show = None
         self.cords = []
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
-        Window.bind(on_touch_up=self.graph_mouse_pos)
+        Window.bind(on_touch_down=self.graph_mouse_pos)
+        Window.bind(on_touch_up=self.remove_point_show)
         Window.bind(on_touch_move=self.graph_move)
         Window.bind(on_resize=self.resize)
         self.function_inputs = [[self.function_input,self.function_colour_input]]
@@ -160,20 +162,36 @@ class GraphingCalc(Widget):
         return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
 
     def graph_move(self,*args):
-        dx = -int(args[1].dx)
-        dy = -int(args[1].dy)
-        dx_carte,dy_carte = self.px_to_carte(dx,dy)
-        dx_carte = dx_carte-self.x_min
-        dy_carte = dy_carte-self.y_min
-        # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
-        self.y_min = self.y_min + dy_carte
-        self.y_max = self.y_max + dy_carte
-        self.x_min = self.x_min + dx_carte
-        self.x_max = self.x_max + dx_carte
-        # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
-        # self.update_lims()
-        self.initialise_graph()
-        self.graph_it()
+        btn = args[1].button
+        if btn == "left" and isinstance(self.point_show,ShowPoint):
+            # Move point show
+            logger.info("Moving co-ordinate point")
+            x_px = args[1].x-self.graph.pos[0]
+            y_px = args[1].y-self.graph.pos[1]
+            carte_x,carte_y = self.px_to_carte(x_px,y_px)
+
+            self.point_show[0].pos = (x_px, y_px)
+            self.point_show[1].pos = (x_px,y_px)
+            self.point_show[1].text = "({}, {})".format(round(carte_x,2),round(carte_y,2))
+        else:
+            dx = -int(args[1].dx)
+            dy = -int(args[1].dy)
+            dx_carte,dy_carte = self.px_to_carte(dx,dy)
+            dx_carte = dx_carte-self.x_min
+            dy_carte = dy_carte-self.y_min
+            # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
+            self.y_min = self.y_min + dy_carte
+            self.y_max = self.y_max + dy_carte
+            self.x_min = self.x_min + dx_carte
+            self.x_max = self.x_max + dx_carte
+            # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
+            # self.update_lims()
+            self.initialise_graph()
+            self.graph_it()
+
+    def remove_point_show(self,*args):
+        # self.point_show = None
+        pass
 
     def graph_mouse_pos(self,*args):
         """
@@ -206,11 +224,14 @@ class GraphingCalc(Widget):
                             #Within 5 px radius
                             logger.info("New optimum point: {}".format(cur_optimum_point))
 
+                if cur_optimum_point != None:
+                    # TODO: Actually use function for set
+                    self.point_show = ShowPoint(self,cur_optimum_point,"sin(x)")
 
                 return True
-
             else:
                 return False
+
             self.x_max *= zoom_factor
             self.x_min *= zoom_factor
             self.y_max *= zoom_factor
@@ -301,7 +322,7 @@ class GraphingCalc(Widget):
                     for var in cur_anim_vars:
                         f_line = f_line.replace(var["name"], str(var["val"]))
 
-                for px_x in range(0, self.graph_width,2):
+                for px_x in range(0, self.graph_width,1):
                     set_none = False
                     # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]
@@ -403,6 +424,31 @@ class LimitsPopup(Popup):
         self.dismiss()
         self.graph.update_lims(self.min_x_input.text, self.max_x_input.text, self.min_y_input.text,
                                 self.max_y_input.text, self.x_step_input.text, self.y_step_input.text)
+
+class ShowPoint(Widget):
+    def __init__(self,graph,point_px,func_line,**kwargs):
+        self.graph = graph
+        self.func_line = func_line
+        super(ShowPoint,self).__init__(**kwargs)
+        with self.canvas:
+            Color(213 / 255, 78 / 255, 160 / 255, 1)
+            # Line(circle=(cur_optimum_point[0],cur_optimum_point[1],3))
+            point_x = point_px[0] - 5
+            point_y = point_px[1] - 5
+            carte_x, carte_y = self.px_to_carte(*cur_optimum_point)
+            self.point = Ellipse(pos=(point_x, point_y), size=(10, 10))
+            self.lbl = Label(text="({}, {})".format(round(carte_x, 2), round(carte_y, 2)),
+                        pos=(cur_optimum_point[0], cur_optimum_point[1]), color=(0, 0, 0, 1), height=20)
+
+    def move_x(self,x):
+        new_x_carte = self.graph.px_to_carte(x,0)[0]
+        new_y_carte = calculations.parse_line(self.func_line.replace("x",x))
+        x_px,y_px = self.graph.carte_to_px(new_x_carte,new_y_carte)
+
+        self.point.pos = (x_px-5,y_px-5)
+        self.lbl.text = "({}, {})".format(round(new_x_carte,2),round(new_y_carte,2))
+        self.lbl.pos = (x_px,y_px)
+
 
 
 class AnimVar(object):
