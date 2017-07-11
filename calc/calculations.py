@@ -60,12 +60,24 @@ functions = {
         "func":lambda x:math.sin(x),
         "level":5,
         "regex_name":"sin"
+    },
+    "cos": {
+        "n": 1,
+        "func": lambda x: math.cos(x),
+        "level": 5,
+        "regex_name": "cos"
+    },
+    "tan": {
+        "n": 1,
+        "func": lambda x: math.tan(x),
+        "level": 5,
+        "regex_name": "tan"
     }
 }
 
 logger = logging.getLogger(__name__)
 
-def parse_line(calc_line,ans):
+def parse_line(calc_line,ans=None):
     """
     Parses a given equation by converting infix to reverse polish
     :param calc_line: The equation
@@ -80,7 +92,7 @@ def parse_line(calc_line,ans):
     for f_name,func in functions.items():
         regex_names.append(func["regex_name"])
 
-    f_line = re.split("({})".format("|".join(regex_names)),calc_line[0])
+    f_line = re.split("({})".format("|".join(regex_names)),calc_line)
 
     logger.info("Eval {}".format(f_line))
 
