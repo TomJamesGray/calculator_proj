@@ -330,7 +330,7 @@ class GraphingCalc(Widget):
                 points = []
                 cur_seg = []
 
-                for px_x in range(0, self.graph_width,1):
+                for px_x in range(0, self.graph_width,2):
                     set_none = False
                     # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]
