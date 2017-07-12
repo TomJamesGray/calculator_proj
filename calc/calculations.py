@@ -3,8 +3,8 @@ import re
 import math
 from calc.helpers import nested_in,nested_contains
 
-#Define the special functions with lambdas
-#and convert from degrees to radians
+# Define the special functions with lambdas
+
 special_functions = [
     ('sin', lambda x: math.sin(x)),
     ('cos', lambda x: math.cos(x)),
@@ -12,91 +12,194 @@ special_functions = [
     ('sqrt',lambda x: math.sqrt(x))
 ]
 
+functions = {
+    "+":{
+        "n":2,
+        "func": lambda x,y: x+y,
+        "level":2,
+        "regex_name":"\+"
+    },
+    "-":{
+        "n":2,
+        "func": lambda x,y: x-y,
+        "level":2,
+        "regex_name":"-"
+    },
+    "*":{
+        "n":2,
+        "func":lambda x,y: x*y,
+        "level":3,
+        "regex_name":"\*"
+    },
+    "/":{
+        "n":2,
+        "func":lambda x,y:x/y,
+        "level":3,
+        "regex_name":"\/"
+    },
+    "^":{
+        "n":2,
+        "func":lambda x,y:x**y,
+        "level":4,
+        "regex_name":"\^"
+    },
+    "(":{
+        "n":0,
+        "func":None,
+        "level":1,
+        "regex_name":"\("
+    },
+    ")":{
+        "n":0,
+        "func":None,
+        "level":1,
+        "regex_name":"\)"
+    },
+    "sin":{
+        "n":1,
+        "func":lambda x:math.sin(x),
+        "level":5,
+        "regex_name":"sin"
+    },
+    "cos": {
+        "n": 1,
+        "func": lambda x: math.cos(x),
+        "level": 5,
+        "regex_name": "cos"
+    },
+    "tan": {
+        "n": 1,
+        "func": lambda x: math.tan(x),
+        "level": 5,
+        "regex_name": "tan"
+    },
+    "&":{
+        "n": 1,
+        "func":lambda x: -x,
+        "level":4.5,
+        "regex_name":"&"
+    },
+}
+unary_operators = {
+    "-":{
+            "n": 1,
+            "func":lambda x: -x,
+            "level":4.5,
+            "regex_name":"&"
+    },
+    "+":{
+            "n": 1,
+            "func":lambda x: x,
+            "level":4.5,
+            "regex_name":"&"
+    },
+}
+
 logger = logging.getLogger(__name__)
-def parse_line(calc_line,prev_ans=None,**kwargs):
+
+def parse_line(calc_line,ans=None):
     """
-    Parses the line from the calculator screen, and replaces ANS with
-    the previous answer and outputs the answer to calc_answer_screen.
-    prev_ans is also set, however in case of an error such as division
-    by 0 the previous answer defaults to 0
+    Parses a given equation by converting infix to reverse polish
+    :param calc_line: The equation
+    :param prev_ans: The value for ANS if it appears in the calc_line, defaults to None
+    :return:
     """
-    global special_functions
-    def parse_special_func(arg_list):
-        """Handle the use of special_functions recursively
-        """
-        arg_str = ""
-        logger.debug("arg_list: {}".format(arg_list))
-        #Go through arg_list and recall parse_special_funcif there's nested
-        #sin's
-        for i,elem in enumerate(arg_list):
-            if nested_in(special_functions,elem) and i != 0:
-                recieved_ans = parse_special_func(arg_list[i:])
-                arg_str = arg_list[i-1] + recieved_ans
+    global functions,unary_operators
+    f_stack = []
+    rpn_line = []
+    last_char = None
+    # Construct regex to split on all operations
+    regex_names = []
+    for f_name,func in functions.items():
+        regex_names.append(func["regex_name"])
 
-        logger.debug("arg_str {}".format(arg_str))
-        #Get function required from special_functions
-        func = nested_in(special_functions,arg_list[0])[1]
-        if arg_str != "":
-            ans = str(func(eval(arg_str)))
-        else:
-            ans = str(func(eval("".join(arg_list[2:]))))
-        logger.debug("ans for sin is {}".format(ans))
-        return ans
+    f_line = re.split("({})".format("|".join(regex_names)),calc_line)
 
+    logger.info("Eval {}".format(f_line))
 
-    #Replace "ANS" with the prev_ans
-    calc_line = calc_line.replace("ANS",str(prev_ans))
-    #Replace π with 3.14...
-    calc_line = calc_line.replace("π",str(math.pi))
-    #Replace kwargs name with the value
-    for name, value in kwargs.items():
-        calc_line = calc_line.replace(name,str(value))
-    #Replcae "^" with **
-    calc_line = calc_line.replace("^","**")
-
-    #Split calc_line by sin, cos and tan
-    split_calc_line = re.split(r'(sin|cos|tan|\)|\()',calc_line)
-    #Strip list of blank elems
-    split_calc_line = list(filter(None,split_calc_line))
-    logger.debug("Split_calc_line after regex: {}".format(split_calc_line))
-
-    parsed_calc_line = []
-    parsed = False
     i = 0
-    while not parsed:
-        if nested_in(special_functions,split_calc_line[i]):
-            #Loop throught next list elems unitl final closing
-            #brakcet is found, as to handle nested brackets
-            
-            #Set it to -1 so the opening bracket of the function
-            #will be ignored
-            closingsToIgnore = -1
-            for j,elem in enumerate(split_calc_line[i:]):
-                if elem == "(":
-                    closingsToIgnore += 1
-                #Closing bracket can be ignored as it belongs to
-                #another opening bracket
-                elif elem == ")" and closingsToIgnore > 0:
-                    closingsToIgnore -= 1
-                elif elem == ")" and closingsToIgnore == 0:
-                    parsed_calc_line.append(parse_special_func(split_calc_line[i:i+j]))
-                    #Add j to i, so that any other nested sin's don't get 
-                    #passed to parse_special_func again
-                    i += j
-        else:
-            parsed_calc_line.append(split_calc_line[i])
-        
-        if i +1 == len(split_calc_line):
-            parsed = True
-        else:
+    while i < len(f_line):
+        c = f_line[i]
+        if c == "":
             i += 1
+            continue
+        logger.debug("Using {}".format(c))
+        if c in functions:
+            # Current item is a function
+            if ((last_char in functions) and (last_char != ")") and (c in unary_operators)) or (last_char == None and c in unary_operators):
+                # Current item is a unary operator
+                logger.debug("Unary operator {}".format(c))
+                rpn_line.append("{}{}".format(c,f_line[i+1]))
+                last_char = f_line[i+1]
+                i += 1
+            elif c == "(":
+                logger.debug("Adding ( to f_stack")
+                f_stack.append(c)
+                last_char = c
+            elif c == ")":
+                logger.debug("Closing bracket")
+                while f_stack[-1] != "(":
+                    rpn_line.append(f_stack.pop())
+                f_stack.pop()
+                logger.debug("f_stack after ')': {}".format(f_stack))
+                last_char = c
 
+            elif len(f_stack) == 0:
+                logger.debug("Appending function {} to empty f_stack".format(c))
+                f_stack.append(c)
+                last_char = c
 
-    logger.debug("Parsed line to eval: {}".format(parsed_calc_line))
-    try:
-        ans = eval("".join(parsed_calc_line))
-    except ZeroDivisionError as e:
-        logger.error("Tried to divide by zero")
-        raise(e)
+            elif functions[f_stack[-1]]["level"] < functions[c]["level"]:
+                logger.debug("Appending function {} to f_stack".format(c))
+                f_stack.append(c)
+                last_char = c
+            else:
+                try:
+                    while functions[f_stack[-1]]["level"] >= functions[c]["level"]:
+                        logger.debug("Adding {} to rpn_line as higher than {}".format(f_stack[-1],c))
+                        rpn_line.append(f_stack.pop())
+                except IndexError:
+                    # f_stack is empty
+                    pass
+                f_stack.append(c)
+                logger.debug("Added {} to f_stack, now {}".format(c,f_stack))
+                last_char = c
+            logger.debug("f_stack at {}".format(f_stack))
 
-    return ans
+        else:
+            # Current item is an operand
+            rpn_line.append(c)
+            last_char = c
+
+        i += 1
+
+    while f_stack != []:
+        rpn_line.append(f_stack.pop())
+
+    logger.info("RPN line at end of parsing: {}".format(rpn_line))
+    val = eval_rpn(rpn_line)
+    return val
+
+def eval_rpn(rpn_line):
+    global functions
+    eval_stack = []
+    for c in rpn_line:
+        if c in functions:
+            logger.debug("Evaluating function {}".format(c))
+            func = functions[c]
+            args = []
+            for i in range(0,func["n"]):
+                # Retrieve required amount of arguments
+                args.append(float(eval_stack.pop()))
+            # Reverse args so first argument would be towards bottom of stack
+            args = args[::-1]
+            logger.debug("Using args: {}".format(args))
+            val = func["func"](*args)
+            eval_stack.append(val)
+            logger.debug("Adding value from function {} to stack".format(val))
+        else:
+            logger.debug("Adding {} to eval_stack".format(c))
+            eval_stack.append(c)
+            logger.debug("eval_stack at {}".format(eval_stack))
+
+    return eval_stack[0]

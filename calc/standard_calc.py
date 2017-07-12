@@ -34,6 +34,10 @@ logging_config = {
             "class": "logging.StreamHandler",
             "formatter": "main",
             "level": logging.INFO},
+        "f_parsing": {
+            "class": "logging.StreamHandler",
+            "formatter": "main",
+            "level": logging.ERROR},
         "gui": {
             "class": "logging.StreamHandler",
             "formatter": "main",
@@ -46,7 +50,10 @@ logging_config = {
         "calc.graph": {
             "handlers": ["calculations"],
             "level": logging.INFO
-        }
+        },
+        "calc.calculations": {
+            "handlers": ["f_parsing"],
+            "level": logging.ERROR},
     }
 }
 print("Setting up logging")
@@ -144,16 +151,21 @@ class Calculator(Widget):
     def handle_parse_line(self):
         """Call parse_line, but set class specific attributes
         """
-        if self.prev_ans != None:
-            self.prev_ans = self.screen.text
-        try:
-            ans = round(calculations.parse_line(
-                    self.screen.text,self.prev_ans),max_precision_out)
-            self.prev_ans = ans
-        except Exception as e:
-            logger.error(e)
-            ans = "Error"
-            self.prev_ans = None
+        # if self.prev_ans != None:
+        #     self.prev_ans = self.screen.text
+        # try:
+        #     ans = round(calculations.parse_line(
+        #             self.screen.text,self.prev_ans),max_precision_out)
+        #     self.prev_ans = ans
+        # except Exception as e:
+        #     logger.error(e)
+        #     ans = "Error"
+        #     self.prev_ans = None
+
+        print(self.screen.text)
+        ans = round(calculations.parse_line((
+            self.screen.text), max_precision_out))
+        self.prev_ans = ans
 
         self.screen.text= str(ans)
         self.clear_on_next_button = True
