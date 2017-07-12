@@ -73,12 +73,6 @@ functions = {
         "level": 5,
         "regex_name": "tan"
     },
-    "&":{
-        "n": 1,
-        "func":lambda x: -x,
-        "level":4.5,
-        "regex_name":"&"
-    },
 }
 unary_operators = {
     "-":{
