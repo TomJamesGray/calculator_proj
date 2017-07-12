@@ -151,8 +151,8 @@ class Calculator(Widget):
     def handle_parse_line(self):
         """Call parse_line, but set class specific attributes
         """
-        if self.prev_ans != None:
-            self.prev_ans = self.screen.text
+        # if self.prev_ans != None:
+        #     self.prev_ans = self.screen.text
         # try:
         #     ans = round(calculations.parse_line(
         #             self.screen.text,self.prev_ans),max_precision_out)
@@ -161,8 +161,10 @@ class Calculator(Widget):
         #     logger.error(e)
         #     ans = "Error"
         #     self.prev_ans = None
+
+        print(self.screen.text)
         ans = round(calculations.parse_line((
-            self.screen.text,self.prev_ans),max_precision_out))
+            self.screen.text), max_precision_out))
         self.prev_ans = ans
 
         self.screen.text= str(ans)

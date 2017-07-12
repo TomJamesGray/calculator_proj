@@ -72,7 +72,27 @@ functions = {
         "func": lambda x: math.tan(x),
         "level": 5,
         "regex_name": "tan"
-    }
+    },
+    "&":{
+        "n": 1,
+        "func":lambda x: -x,
+        "level":4.5,
+        "regex_name":"&"
+    },
+}
+unary_operators = {
+    "-":{
+            "n": 1,
+            "func":lambda x: -x,
+            "level":4.5,
+            "regex_name":"&"
+    },
+    "+":{
+            "n": 1,
+            "func":lambda x: x,
+            "level":4.5,
+            "regex_name":"&"
+    },
 }
 
 logger = logging.getLogger(__name__)
@@ -84,9 +104,10 @@ def parse_line(calc_line,ans=None):
     :param prev_ans: The value for ANS if it appears in the calc_line, defaults to None
     :return:
     """
-    global functions
+    global functions,unary_operators
     f_stack = []
     rpn_line = []
+    last_char = None
     # Construct regex to split on all operations
     regex_names = []
     for f_name,func in functions.items():
@@ -96,28 +117,42 @@ def parse_line(calc_line,ans=None):
 
     logger.info("Eval {}".format(f_line))
 
-    for c in f_line:
+    i = 0
+    while i < len(f_line):
+        c = f_line[i]
         if c == "":
+            i += 1
             continue
         logger.debug("Using {}".format(c))
         if c in functions:
             # Current item is a function
-            if c == "(":
+            if ((last_char in functions) and (last_char != ")") and (c in unary_operators)) or (last_char == None and c in unary_operators):
+                # Current item is a unary operator
+                logger.debug("Unary operator {}".format(c))
+                rpn_line.append("{}{}".format(c,f_line[i+1]))
+                last_char = f_line[i+1]
+                i += 1
+            elif c == "(":
                 logger.debug("Adding ( to f_stack")
                 f_stack.append(c)
+                last_char = c
             elif c == ")":
                 logger.debug("Closing bracket")
                 while f_stack[-1] != "(":
                     rpn_line.append(f_stack.pop())
                 f_stack.pop()
                 logger.debug("f_stack after ')': {}".format(f_stack))
+                last_char = c
 
             elif len(f_stack) == 0:
                 logger.debug("Appending function {} to empty f_stack".format(c))
                 f_stack.append(c)
+                last_char = c
+
             elif functions[f_stack[-1]]["level"] < functions[c]["level"]:
                 logger.debug("Appending function {} to f_stack".format(c))
                 f_stack.append(c)
+                last_char = c
             else:
                 try:
                     while functions[f_stack[-1]]["level"] >= functions[c]["level"]:
@@ -128,11 +163,15 @@ def parse_line(calc_line,ans=None):
                     pass
                 f_stack.append(c)
                 logger.debug("Added {} to f_stack, now {}".format(c,f_stack))
+                last_char = c
             logger.debug("f_stack at {}".format(f_stack))
 
         else:
             # Current item is an operand
             rpn_line.append(c)
+            last_char = c
+
+        i += 1
 
     while f_stack != []:
         rpn_line.append(f_stack.pop())
