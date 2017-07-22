@@ -379,9 +379,8 @@ class GraphingCalc(Widget):
                 Translate(xy=self.pos)
 
     def add_function(self):
-        container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:45,1:145,2:95},cols=3,
+        container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:190,1:95},cols=2,
                                spacing=(5,5))
-        container.add_widget(Label(text="y = "))
         new_input = TextInput(write_tab=False)
         new_col_input = ColourSpinner()
         self.function_inputs.append([new_input,new_col_input])
