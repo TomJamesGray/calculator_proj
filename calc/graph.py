@@ -41,6 +41,7 @@ class GraphingCalc(Widget):
         self.y_label_objects = None
         self.graph_it_loop = None
         self.point_show = None
+        self.popup_active = False
         self.cords = []
         self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
         Window.bind(on_touch_down=self.graph_mouse_pos)
@@ -162,27 +163,28 @@ class GraphingCalc(Widget):
         return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
 
     def graph_move(self,*args):
-        btn = args[1].button
-        if btn == "left" and isinstance(self.point_show,ShowPoint):
-            # Move point show
-            x_px = args[1].x-self.graph.pos[0]
-            logger.info("Moving co-ordinate point to x px = {} on graph".format(x_px))
-            self.point_show.move_x(x_px)
-        else:
-            dx = -int(args[1].dx)
-            dy = -int(args[1].dy)
-            dx_carte,dy_carte = self.px_to_carte(dx,dy)
-            dx_carte = dx_carte-self.x_min
-            dy_carte = dy_carte-self.y_min
-            # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
-            self.y_min = self.y_min + dy_carte
-            self.y_max = self.y_max + dy_carte
-            self.x_min = self.x_min + dx_carte
-            self.x_max = self.x_max + dx_carte
-            # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
-            # self.update_lims()
-            self.initialise_graph()
-            self.graph_it()
+        if not self.popup_active:
+            btn = args[1].button
+            if btn == "left" and isinstance(self.point_show,ShowPoint):
+                # Move point show
+                x_px = args[1].x-self.graph.pos[0]
+                logger.info("Moving co-ordinate point to x px = {} on graph".format(x_px))
+                self.point_show.move_x(x_px)
+            else:
+                dx = -int(args[1].dx)
+                dy = -int(args[1].dy)
+                dx_carte,dy_carte = self.px_to_carte(dx,dy)
+                dx_carte = dx_carte-self.x_min
+                dy_carte = dy_carte-self.y_min
+                # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
+                self.y_min = self.y_min + dy_carte
+                self.y_max = self.y_max + dy_carte
+                self.x_min = self.x_min + dx_carte
+                self.x_max = self.x_max + dx_carte
+                # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
+                # self.update_lims()
+                self.initialise_graph()
+                self.graph_it()
 
     def remove_point_show(self,*args):
         if self.point_show != None:
@@ -195,50 +197,51 @@ class GraphingCalc(Widget):
         :param args:
         :return:
         """
-        x_px = int(args[1].pos[0])
-        y_px = int(args[1].pos[1])
-        if self.graph.collide_point(x_px,y_px):
-            btn = args[1].button
-            if btn == "scrollup":
-                zoom_factor = 1.05
-            elif btn == "scrolldown":
-                zoom_factor = 0.95
-            elif btn == "left":
-                # Don't plot points if graph is currently playing with anim vars
-                graph_x_px = x_px-self.graph.pos[0]
-                graph_y_px = y_px-self.graph.pos[1]
-                logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
-                # Loop through cords
-                cur_min_delta = 6
-                cur_optimum_point = None
-                cur_function = None
-                for f_no,set in enumerate(self.cords):
-                    for i in range(0,len(set),2):
-                        x = set[i]
-                        y = set[i+1]
-                        delta = ((graph_x_px-x)**2+(graph_y_px-y)**2)**0.5
-                        if delta < 5 and delta < cur_min_delta:
-                            cur_optimum_point = (x,y)
-                            cur_min_delta = delta
-                            cur_function = f_no
-                            #Within 5 px radius
-                            logger.info("New optimum point: {}".format(cur_optimum_point))
+        if not self.popup_active:
+            x_px = int(args[1].pos[0])
+            y_px = int(args[1].pos[1])
+            if self.graph.collide_point(x_px,y_px):
+                btn = args[1].button
+                if btn == "scrollup":
+                    zoom_factor = 1.05
+                elif btn == "scrolldown":
+                    zoom_factor = 0.95
+                elif btn == "left":
+                    # Don't plot points if graph is currently playing with anim vars
+                    graph_x_px = x_px-self.graph.pos[0]
+                    graph_y_px = y_px-self.graph.pos[1]
+                    logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
+                    # Loop through cords
+                    cur_min_delta = 6
+                    cur_optimum_point = None
+                    cur_function = None
+                    for f_no,set in enumerate(self.cords):
+                        for i in range(0,len(set),2):
+                            x = set[i]
+                            y = set[i+1]
+                            delta = ((graph_x_px-x)**2+(graph_y_px-y)**2)**0.5
+                            if delta < 5 and delta < cur_min_delta:
+                                cur_optimum_point = (x,y)
+                                cur_min_delta = delta
+                                cur_function = f_no
+                                #Within 5 px radius
+                                logger.info("New optimum point: {}".format(cur_optimum_point))
 
-                if cur_optimum_point != None:
-                    self.point_show = ShowPoint(self,cur_optimum_point,self.function_inputs[cur_function][0].text)
-                    self.add_widget(self.point_show)
+                    if cur_optimum_point != None:
+                        self.point_show = ShowPoint(self,cur_optimum_point,self.function_inputs[cur_function][0].text)
+                        self.add_widget(self.point_show)
 
-                return True
-            else:
-                return False
+                    return True
+                else:
+                    return False
 
-            self.x_max *= zoom_factor
-            self.x_min *= zoom_factor
-            self.y_max *= zoom_factor
-            self.y_min *= zoom_factor
-            # self.update_lims()
-            self.initialise_graph()
-            self.graph_it()
+                self.x_max *= zoom_factor
+                self.x_min *= zoom_factor
+                self.y_max *= zoom_factor
+                self.y_min *= zoom_factor
+                # self.update_lims()
+                self.initialise_graph()
+                self.graph_it()
 
     def update_lims(self,x_min,x_max,y_min,y_max,x_step,y_step):
         """
@@ -409,6 +412,7 @@ class GraphingCalc(Widget):
         self.function_grid.add_widget(container)
 
     def adjust_axes_btn(self):
+        self.popup_active = True
         LimitsPopup(self).open()
         # self.a = x
 
@@ -429,6 +433,7 @@ class LimitsPopup(Popup):
         # self.dismiss()
         # self.dismiss()
         self.dismiss()
+        self.graph.popup_active = False
         self.graph.update_lims(self.min_x_input.text, self.max_x_input.text, self.min_y_input.text,
                                 self.max_y_input.text, self.x_step_input.text, self.y_step_input.text)
 
