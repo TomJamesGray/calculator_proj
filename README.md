@@ -1,4 +1,7 @@
 # Calculator
+![Standard calculation screen image](calc1.png)
+![Graphing mode image with tan(x)](calc2.png)
+
 A calculator written in python and kivy with a standard calculation mode and a graphing mode using reverse polish notation
 and the shunting yard algorithm. Currently all the standard operators such as +,-,/,* (including unary - and +) and ^
 are implemented as well as sin,cos and tan (in radians).
