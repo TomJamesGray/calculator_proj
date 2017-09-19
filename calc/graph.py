@@ -3,6 +3,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.spinner import Spinner
+from kivy.uix.button import Button
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
@@ -35,7 +36,7 @@ class GraphingCalc(Widget):
         self.y_min = -5
         self.y_grid_step = 1
         self.y_label_step = 1
-        self.graph_width = 600
+        self.graph_width = 540
         self.graph_height = 410
         self.x_label_objects = None
         self.y_label_objects = None
@@ -43,7 +44,7 @@ class GraphingCalc(Widget):
         self.point_show = None
         self.popup_active = False
         self.cords = []
-        self.graph = RelativeLayout(pos=(300,0),width=self.graph_width,height=self.graph_height)
+        self.graph = RelativeLayout(pos=(340,0),width=self.graph_width,height=self.graph_height)
         Window.bind(on_touch_down=self.graph_mouse_pos)
         Window.bind(on_touch_up=self.remove_point_show)
         Window.bind(on_touch_move=self.graph_move)
@@ -382,11 +383,13 @@ class GraphingCalc(Widget):
                 Translate(xy=self.pos)
 
     def add_function(self):
-        container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:190,1:95},cols=2,
+        container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:40,1:190,2:95},cols=3,
                                spacing=(5,5))
         new_input = TextInput(write_tab=False)
         new_col_input = ColourSpinner()
+        delete_func = Button(text="Del")
         self.function_inputs.append([new_input,new_col_input])
+        container.add_widget(delete_func)
         container.add_widget(new_input)
         container.add_widget(new_col_input)
         self.function_grid.add_widget(container)
@@ -451,7 +454,7 @@ class ShowPoint(Widget):
             point_y = point_px[1] - 5
             carte_x, carte_y = self.graph.px_to_carte(*point_px)
 
-            abs_point_x = point_x + 300
+            abs_point_x = point_x + 340
             abs_point_y = point_y
 
             self.point = Ellipse(pos=(abs_point_x, abs_point_y), size=(10, 10))
@@ -473,9 +476,9 @@ class ShowPoint(Widget):
         logger.info("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
         x_px,y_px = self.graph.carte_to_px(new_x_carte,new_y_carte)
 
-        self.point.pos = (x_px-5+300,y_px-5)
+        self.point.pos = (x_px-5+340,y_px-5)
         self.lbl.text = "({}, {})".format(round(new_x_carte,2),round(new_y_carte,2))
-        self.lbl.pos = (x_px+300,y_px)
+        self.lbl.pos = (x_px+340,y_px)
 
     def update(self):
         logger.info("Updating point show at x={}".format(self.x_px))

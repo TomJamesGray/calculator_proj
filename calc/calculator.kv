@@ -153,7 +153,7 @@
     GridLayout:
         cols:3
         pos:(0,root.height-105)
-        width:300
+        width:340
         height:60
         row_default_height:30
         row_force_default:True
@@ -175,7 +175,7 @@
 
     ScrollView:
         height:root.height-40-60
-        width:300
+        width:340
         pos:(0,0)
         size_hint:(1,None)
         GridLayout:
@@ -196,8 +196,10 @@
                 row_default_height:30
                 width:300
                 row_force_default:True
-                cols_minimum:{0:190,1:95}
-                cols:2
+                cols_minimum:{0:40,1:190,2:95}
+                cols:3
+                Button:
+                    text:"Del"
                 TextInput:
                     id:function_input
                 ColourSpinner:
