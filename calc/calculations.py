@@ -1,16 +1,7 @@
 import logging
 import re
 import math
-from calc.helpers import nested_in,nested_contains
 
-# Define the special functions with lambdas
-
-special_functions = [
-    ('sin', lambda x: math.sin(x)),
-    ('cos', lambda x: math.cos(x)),
-    ('tan', lambda x: math.tan(x)),
-    ('sqrt',lambda x: math.sqrt(x))
-]
 
 functions = {
     "+":{
