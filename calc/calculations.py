@@ -196,4 +196,4 @@ def eval_rpn(rpn_line):
             eval_stack.append(c)
             logger.debug("eval_stack at {}".format(eval_stack))
 
-    return eval_stack[0]
+    return float(eval_stack[0])
