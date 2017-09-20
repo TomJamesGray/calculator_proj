@@ -12,7 +12,7 @@ from kivy.properties import ObjectProperty
 from kivy.graphics import Rectangle,Color,Translate,Ellipse,Line
 from kivy.clock import Clock
 from calc import calculations
-from calc.helpers import float_range,float_round
+from calc.helpers import float_range,float_round,float_to_str
 
 logger = logging.getLogger(__name__)
 
@@ -497,7 +497,7 @@ class ShowPoint(Widget):
         new_x_carte = self.graph.px_to_carte(x,0)[0]
 
         # Insert any anim vars wihout stepping over them and replace x
-        f_line_evaluate = self.graph.insert_anim_vars(self.func_line.replace("x", str(new_x_carte)), False)
+        f_line_evaluate = self.graph.insert_anim_vars(self.func_line.replace("x", float_to_str(new_x_carte)), False)
         new_y_carte = calculations.parse_line(f_line_evaluate)
 
         logger.info("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
