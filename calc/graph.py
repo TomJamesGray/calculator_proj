@@ -413,6 +413,7 @@ class GraphingCalc(Widget):
                 self.function_grid.remove_widget(self.function_grid.children[i])
         # Update function inputs
         self.function_inputs = new_func_inputs
+        self.graph_it(True)
 
 
     def add_anim_var(self):
