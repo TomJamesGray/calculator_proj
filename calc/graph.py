@@ -49,7 +49,9 @@ class GraphingCalc(Widget):
         Window.bind(on_touch_up=self.remove_point_show)
         Window.bind(on_touch_move=self.graph_move)
         Window.bind(on_resize=self.resize)
-        self.function_inputs = [[self.function_input,self.function_colour_input]]
+        # self.function_inputs = [[self.function_input,self.function_colour_input]]
+        self.function_inputs = []
+        self.add_function()
         self.anim_vars = []
         self.colour_maps = {
             "Colour":(0,0,0,1),
