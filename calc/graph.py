@@ -336,12 +336,17 @@ class GraphingCalc(Widget):
                 points = []
                 cur_seg = []
 
+                # Parse the function line still with "x"s, then just evaluate the RPN line
+                # with "x"s replaced for values
+                rpn_line = calculations.parse_line(f_line,evaluate=False)
+
                 for px_x in range(0, self.graph_width,2):
                     set_none = False
                     # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]
                     try:
-                        carte_y = calculations.parse_line(f_line.replace("x",str(carte_x)))
+                        tmp_rpn = [x.replace("x",str(carte_x)) for x in rpn_line]
+                        carte_y = calculations.eval_rpn(tmp_rpn)
                     except Exception:
                         prev_x = None
                         prev_y = None

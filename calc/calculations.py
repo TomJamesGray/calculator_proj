@@ -82,7 +82,7 @@ unary_operators = {
 
 logger = logging.getLogger(__name__)
 
-def parse_line(calc_line,ans=None):
+def parse_line(calc_line,evaluate=True,ans=None):
     """
     Parses a given equation by converting infix to reverse polish
     :param calc_line: The equation
@@ -162,8 +162,11 @@ def parse_line(calc_line,ans=None):
         rpn_line.append(f_stack.pop())
 
     logger.info("RPN line at end of parsing: {}".format(rpn_line))
-    val = eval_rpn(rpn_line)
-    return val
+    if evaluate:
+        val = eval_rpn(rpn_line)
+        return val
+    else:
+        return rpn_line
 
 def eval_rpn(rpn_line):
     global functions
