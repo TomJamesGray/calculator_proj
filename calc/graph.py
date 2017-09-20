@@ -390,11 +390,30 @@ class GraphingCalc(Widget):
         new_input = TextInput(write_tab=False)
         new_col_input = ColourSpinner()
         delete_func = Button(text="Del")
-        self.function_inputs.append([new_input,new_col_input])
+        delete_func.bind(on_press=self.delete_function)
+
+        self.function_inputs.append([new_input,new_col_input,delete_func])
         container.add_widget(delete_func)
         container.add_widget(new_input)
         container.add_widget(new_col_input)
         self.function_grid.add_widget(container)
+
+    def delete_function(self,instance):
+        """
+        Button handler for delete button next to function, loops through all function inputs
+        and if the delete button instance is found, then the parent of that will be deleted
+        :param instance: Delete button instance
+        """
+        new_func_inputs = []
+        for i,func_group in enumerate(self.function_inputs):
+            if func_group[2] is not instance:
+                new_func_inputs.append(func_group)
+            else:
+                # Remove the function input group from the function grid
+                self.function_grid.remove_widget(self.function_grid.children[i])
+        # Update function inputs
+        self.function_inputs = new_func_inputs
+
 
     def add_anim_var(self):
         container = GridLayout(cols=8)
