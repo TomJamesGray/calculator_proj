@@ -64,6 +64,24 @@ functions = {
         "level": 5,
         "regex_name": "tan"
     },
+    "arcsin": {
+        "n": 1,
+        "func": lambda x: math.asin(x),
+        "level": 5,
+        "regex_name": "arcsin"
+    },
+    "arccos": {
+        "n": 1,
+        "func": lambda x: math.acos(x),
+        "level": 5,
+        "regex_name": "arccos"
+    },
+    "arctan": {
+        "n": 1,
+        "func": lambda x: math.atan(x),
+        "level": 5,
+        "regex_name": "arctan"
+    }
 }
 unary_operators = {
     "-":{
