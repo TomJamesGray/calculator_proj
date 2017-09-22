@@ -53,11 +53,14 @@ class GraphingCalc(Widget):
         self.function_inputs = []
         self.add_function()
         self.anim_vars = []
+        # Colours define in from (R,G,B,A,Dashed line)
+        # Dashed line is boolean
         self.colour_maps = {
-            "Colour":(0,0,0,1),
-            "Black":(0,0,0,1),
-            "Red":(1,0,0,1),
-            "Blue":(0,0,1,1)
+            "Colour":(0,0,0,1,False),
+            "Black":(0,0,0,1,False),
+            "Red":(1,0,0,1,False),
+            "Blue":(0,0,1,1,False),
+            "Black - Dashed":(0,0,0,1,True)
         }
 
         self.initialise_graph()
@@ -379,10 +382,27 @@ class GraphingCalc(Widget):
                         cur_seg.append(px_y)
 
                 points.append(cur_seg)
-                Color(*func_col)
+                Color(*func_col[0:3])
                 for seg in points:
                     [func_cords.append(x) for x in seg]
-                    Line(points=seg,width=1.01)
+                    if func_col[4]:
+                        # Dashed line
+                        dashed_segs = [[]]
+                        gap = 5
+                        plot = 8
+                        for i in range(0,len(seg),2):
+                            # 20 points on, 10 points off
+                            if i % (gap+plot) <= plot:
+                                dashed_segs[-1].append(seg[i])
+                                dashed_segs[-1].append(seg[i+1])
+                            elif dashed_segs[-1] != [] and i % (gap+plot) > plot:
+                                dashed_segs.append([])
+
+                        for seg in dashed_segs:
+                            Line(points=seg,width=1.01)
+
+                    else:
+                        Line(points=seg,width=1.01)
 
                 self.cords.append(func_cords)
 
