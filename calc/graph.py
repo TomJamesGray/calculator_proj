@@ -49,7 +49,6 @@ class GraphingCalc(Widget):
         Window.bind(on_touch_up=self.remove_point_show)
         Window.bind(on_touch_move=self.graph_move)
         Window.bind(on_resize=self.resize)
-        # self.function_inputs = [[self.function_input,self.function_colour_input]]
         self.function_inputs = []
         self.add_function()
         self.anim_vars = []
@@ -182,13 +181,10 @@ class GraphingCalc(Widget):
                 dx_carte,dy_carte = self.px_to_carte(dx,dy)
                 dx_carte = dx_carte-self.x_min
                 dy_carte = dy_carte-self.y_min
-                # print("Graph move event dx: {}, dy: {} (px)\ndx: {}, dy:{} (carte)".format(dx,dy,dx_carte,dy_carte))
                 self.y_min = self.y_min + dy_carte
                 self.y_max = self.y_max + dy_carte
                 self.x_min = self.x_min + dx_carte
                 self.x_max = self.x_max + dx_carte
-                # print("x min: {}, x max: {}\ny min: {},y max:{}".format(self.x_min,self.x_max,self.y_min,self.y_max))
-                # self.update_lims()
                 self.initialise_graph()
                 self.graph_it()
 
@@ -230,7 +226,7 @@ class GraphingCalc(Widget):
                                 cur_optimum_point = (x,y)
                                 cur_min_delta = delta
                                 cur_function = f_no
-                                #Within 5 px radius
+                                # Within 5 px radius
                                 logger.info("New optimum point: {}".format(cur_optimum_point))
 
                     if cur_optimum_point != None:
@@ -245,7 +241,6 @@ class GraphingCalc(Widget):
                 self.x_min *= zoom_factor
                 self.y_max *= zoom_factor
                 self.y_min *= zoom_factor
-                # self.update_lims()
                 self.initialise_graph()
                 self.graph_it()
 
@@ -253,8 +248,6 @@ class GraphingCalc(Widget):
         """
         Updates the values for the min, max and step text inputs for x and y
         """
-        # self.a.dismiss()
-        # logger.info("I")
         self.x_min = float(x_min)
         self.x_max = float(x_max)
         self.y_min = float(y_min)
@@ -291,7 +284,6 @@ class GraphingCalc(Widget):
         with self.graph.canvas:
             Color(*col)
             Rectangle(pos=pos,size=size)
-            # Translate(xy=self.pos)
 
     def insert_anim_vars(self,f_line,step=True):
         """
@@ -395,10 +387,10 @@ class GraphingCalc(Widget):
                     if func_col[4]:
                         # Dashed line
                         dashed_segs = [[]]
+                        # For every 8 points plotted leave a gap of 5
                         gap = 5
                         plot = 8
                         for i in range(0,len(seg),2):
-                            # 20 points on, 10 points off
                             if i % (gap+plot) <= plot:
                                 dashed_segs[-1].append(seg[i])
                                 dashed_segs[-1].append(seg[i+1])
@@ -448,15 +440,16 @@ class GraphingCalc(Widget):
         self.function_inputs = new_func_inputs
         self.graph_it(True)
 
-
     def add_anim_var(self):
+        """
+        Button handler for add animated variable button
+        """
         container = GridLayout(cols=8)
         name = TextInput(write_tab=False,font_size="10sp")
         min = TextInput(write_tab=False,font_size="10sp")
         max = TextInput(write_tab=False,font_size="10sp")
         step = TextInput(write_tab=False,font_size="10sp")
         self.anim_vars.append(AnimVar(name,min,max,step))
-        # for i,x in enumerate(["Name","Min","Max","Step"]):
 
         container.add_widget(Label(font_size="10sp",text="Name"))
         container.add_widget(name)
@@ -472,7 +465,6 @@ class GraphingCalc(Widget):
     def adjust_axes_btn(self):
         self.popup_active = True
         LimitsPopup(self).open()
-        # self.a = x
 
 class LimitsPopup(Popup):
     max_x_input = ObjectProperty(None)
@@ -484,12 +476,11 @@ class LimitsPopup(Popup):
 
     def __init__(self,graph,**kwargs):
         super(LimitsPopup,self).__init__(**kwargs)
+        logger.debug("Opening limits popup")
         self.graph = graph
 
     def update(self):
-        logger.info("Updating limits from popup")
-        # self.dismiss()
-        # self.dismiss()
+        logger.debug("Updating limits from popup")
         self.dismiss()
         self.graph.popup_active = False
         self.graph.update_lims(self.min_x_input.text, self.max_x_input.text, self.min_y_input.text,
@@ -500,11 +491,10 @@ class ShowPoint(Widget):
         self.graph = graph
         self.func_line = func_line
         self.x_px = point_px[0]
-        logger.info("Initial x_px: {}".format(self.x_px))
+        logger.info("Show point - initial x_px: {}".format(self.x_px))
         super(ShowPoint,self).__init__(**kwargs)
         with self.canvas:
             Color(213 / 255, 78 / 255, 160 / 255, 1)
-            # Line(circle=(cur_optimum_point[0],cur_optimum_point[1],3))
             point_x = point_px[0] - 5
             point_y = point_px[1] - 5
             carte_x, carte_y = self.graph.px_to_carte(*point_px)
@@ -521,24 +511,17 @@ class ShowPoint(Widget):
         Moves the position of the show point widget on the graph
         :param x: The x value of the co-ordinates of the new point on the graph
         """
-        logger.info("Moving x to x_px (on canvas) to {}:".format(x))
+        logger.debug("Moving x to x_px (on canvas) to {}:".format(x))
         new_x_carte = self.graph.px_to_carte(x,0)[0]
+        # Get new cartesian y value with new x val
+        new_y_carte = calculations.parse_line(self.graph.insert_anim_vars(self.func_line),x=new_x_carte)
 
-        # Insert any anim vars wihout stepping over them and replace x
-        f_line_evaluate = self.graph.insert_anim_vars(self.func_line.replace("x", float_to_str(new_x_carte)), False)
-        new_y_carte = calculations.parse_line(f_line_evaluate)
-
-        logger.info("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
+        logger.debug("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
         x_px,y_px = self.graph.carte_to_px(new_x_carte,new_y_carte)
 
         self.point.pos = (x_px-5+340,y_px-5)
         self.lbl.text = "({}, {})".format(round(new_x_carte,2),round(new_y_carte,2))
         self.lbl.pos = (x_px+340,y_px)
-
-    def update(self):
-        logger.info("Updating point show at x={}".format(self.x_px))
-        self.move_x(self.x_px)
-
 
 class AnimVar(object):
     def __init__(self,name_in,min_in,max_in,step_in):
