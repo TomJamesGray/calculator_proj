@@ -277,7 +277,7 @@ class GraphingCalc(Widget):
                 logger.info("Enabling animated variables")
                 for var in self.anim_vars:
                     var.disabled = False
-                self.graph_it_loop = Clock.schedule_interval(lambda x: (True,True), 0.1)
+                self.graph_it_loop = Clock.schedule_interval(lambda x: self.graph_it(True,True), 0.1)
                 btn.text = "Pause"
         else:
             logger.info("Disabling animated variables")
