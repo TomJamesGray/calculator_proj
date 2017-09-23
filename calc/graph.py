@@ -277,7 +277,7 @@ class GraphingCalc(Widget):
                 logger.info("Enabling animated variables")
                 for var in self.anim_vars:
                     var.disabled = False
-                self.graph_it_loop = Clock.schedule_interval(lambda x: self.graph_it(True,True), 0.1)
+                self.graph_it_loop = Clock.schedule_interval(lambda x: (True,True), 0.1)
                 btn.text = "Pause"
         else:
             logger.info("Disabling animated variables")
@@ -546,6 +546,15 @@ class ShowPoint(Widget):
         self.point.pos = (x_px-5+340,y_px-5)
         self.lbl.text = "({}, {})".format(round(new_x_carte,2),round(new_y_carte,2))
         self.lbl.pos = (x_px+340,y_px)
+
+        def update(self):
+            """
+            Recalculate the y value with the existing x value and move the point displayed if needed
+            :return:
+            """
+            logger.info("Updating point show at x={}".format(self.x_px))
+            self.move_x(self.x_px)
+
 
 class AnimVar(object):
     def __init__(self,name_in,min_in,max_in,step_in):
