@@ -148,15 +148,12 @@
                 text:"Standard mode"
 
     GridLayout:
-        cols:3
+        cols:2
         pos:(0,root.height-105)
         width:340
         height:60
         row_default_height:30
         row_force_default:True
-        Button:
-            text:"Plot it"
-            on_press:root.graph_it(True)
         Button:
             text:"Add function"
             on_press:root.add_function()
