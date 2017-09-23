@@ -399,10 +399,10 @@ class GraphingCalc(Widget):
                                 dashed_segs.append([])
 
                         for seg in dashed_segs:
-                            Line(points=seg,width=1.01)
+                            Line(points=seg,width=1)
 
                     else:
-                        Line(points=seg,width=1.01)
+                        Line(points=seg,width=1)
 
                 self.cords.append(func_cords)
 
