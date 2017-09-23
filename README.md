@@ -9,10 +9,10 @@ then pressing the "play" button.
 ![Standard calculation screen image](calc1.png)
 ![Graphing mode image with tan(x)](calc2.png)
 ### Known Issues:
-* In graphing mode equations like `(x+3)(x-2)` do not work as a * must be put in between them, similarly stuff
-like 3x isn't handled as expected so a * must be put in making it `3*x`
+* In graphing mode equations like `(x+3)(x-2)` do not work as a * must be put in between them
 
 ### Todo:
-* Add ability to remove lines in graphing mode
 * Add automatic changing of the grid line frequency and labels on zoom in/out
-
+* Adjust how zooming is handled, make it so that it zooms around the mouse point
+* Add adjustable precision (decimal module?) so jagged lines don't start showing when zoomed in
+* Add parametric equations
