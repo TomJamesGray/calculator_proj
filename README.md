@@ -14,6 +14,5 @@ like 3x isn't handled as expected so a * must be put in making it `3*x`
 
 ### Todo:
 * Add ability to remove lines in graphing mode
-* Add handling for stuff like `3x`, ie remove need to write `3*x`
 * Add automatic changing of the grid line frequency and labels on zoom in/out
 
