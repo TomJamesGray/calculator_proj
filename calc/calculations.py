@@ -186,7 +186,7 @@ def parse_line(calc_line,evaluate=True,ans=None):
     else:
         return rpn_line
 
-def eval_rpn(rpn_line):
+def eval_rpn(rpn_line,x):
     global functions
     eval_stack = []
     for c in rpn_line:
@@ -205,6 +205,12 @@ def eval_rpn(rpn_line):
             logger.debug("Adding value from function {} to stack".format(val))
         else:
             logger.debug("Adding {} to eval_stack".format(c))
+            if c.endswith("x"):
+                if len(c) > 1:
+                    c = str(float(c[:-1]) * x)
+                else:
+                    c = str(x)
+
             eval_stack.append(c)
             logger.debug("eval_stack at {}".format(eval_stack))
 

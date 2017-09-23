@@ -348,8 +348,7 @@ class GraphingCalc(Widget):
                     # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]
                     try:
-                        tmp_rpn = [x.replace("x",str(carte_x)) for x in rpn_line]
-                        carte_y = calculations.eval_rpn(tmp_rpn)
+                        carte_y = calculations.eval_rpn(rpn_line,carte_x)
                     except Exception:
                         prev_x = None
                         prev_y = None
