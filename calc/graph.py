@@ -413,6 +413,7 @@ class GraphingCalc(Widget):
         container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:40,1:190,2:95},cols=3,
                                spacing=(5,5))
         new_input = TextInput(write_tab=False)
+        new_input.bind(text=self.graph_it)
         new_col_input = ColourSpinner()
         delete_func = Button(text="Del")
         delete_func.bind(on_press=self.delete_function)
