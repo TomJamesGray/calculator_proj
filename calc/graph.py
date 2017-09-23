@@ -293,9 +293,6 @@ class GraphingCalc(Widget):
             Rectangle(pos=pos,size=size)
             # Translate(xy=self.pos)
 
-    def graph_it_btn(self):
-        Clock.schedule_interval(self.graph_it, 1)
-
     def insert_anim_vars(self,f_line,step=True):
         """
         Inserts and by default steps over any anim vars
@@ -337,6 +334,7 @@ class GraphingCalc(Widget):
                 if f_line == "":
                     # Don't try and evaluate an empty line
                     return True
+
                 func_col = self.colour_maps[func[1].text]
                 func_cords = []
                 points = []
