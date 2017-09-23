@@ -116,7 +116,6 @@ class GraphingCalc(Widget):
 
             # Add x labels
             x_labels = list(range(int(self.x_min),int(self.x_max+self.x_label_step),self.x_label_step))
-            x_spacing = self.graph_width/len(x_labels)
 
             for i,lbl in enumerate(x_labels):
                 x,y = self.carte_to_px(x_labels[i], 0)
@@ -129,7 +128,6 @@ class GraphingCalc(Widget):
 
             # Add y labels
             y_labels = list(range(int(self.y_min), int(self.y_max + self.y_label_step), self.y_label_step))
-            y_spacing = self.graph_height / len(y_labels)
 
             for i, lbl in enumerate(y_labels):
                 x, y = self.carte_to_px(0,y_labels[i])
@@ -161,88 +159,99 @@ class GraphingCalc(Widget):
         Converts a given pixel co-ordinate into the coresponding cartesian co-ordinate
         :param px_x: X value for co-oridnatea
         :param px_y: Y value for co-ordinate
-        :return:
+        :return: (X,Y) tuple with co-ordinates for the value the graph displays
         """
         prop_x = px_x/self.graph_width
         prop_y = px_y/self.graph_height
         return (prop_x*(self.x_max-self.x_min)+self.x_min,prop_y*(self.y_max-self.y_min)+self.y_min)
 
     def graph_move(self,*args):
-        if not self.popup_active:
-            btn = args[1].button
-            if btn == "left" and isinstance(self.point_show,ShowPoint):
-                # Move point show
-                x_px = args[1].x-self.graph.pos[0]
-                logger.info("Moving co-ordinate point to x px = {} on graph".format(x_px))
-                self.point_show.move_x(x_px)
-            else:
-                dx = -int(args[1].dx)
-                dy = -int(args[1].dy)
-                dx_carte,dy_carte = self.px_to_carte(dx,dy)
-                dx_carte = dx_carte-self.x_min
-                dy_carte = dy_carte-self.y_min
-                self.y_min = self.y_min + dy_carte
-                self.y_max = self.y_max + dy_carte
-                self.x_min = self.x_min + dx_carte
-                self.x_max = self.x_max + dx_carte
-                self.initialise_graph()
-                self.graph_it()
+        """
+        Handles the dragging action on the graph canvas
+        """
+        # If a popup is displayed, then don't allow graph to move
+        if self.popup_active:
+            return True
+
+        btn = args[1].button
+        if btn == "left" and isinstance(self.point_show,ShowPoint):
+            # Move point show
+            x_px = args[1].x-self.graph.pos[0]
+            logger.info("Moving co-ordinate point to x px = {} on graph".format(x_px))
+            self.point_show.move_x(x_px)
+        else:
+            # Move the graph by adjusting the limits and redrawing
+            dx = -int(args[1].dx)
+            dy = -int(args[1].dy)
+            dx_carte,dy_carte = self.px_to_carte(dx,dy)
+            dx_carte = dx_carte-self.x_min
+            dy_carte = dy_carte-self.y_min
+            self.y_min = self.y_min + dy_carte
+            self.y_max = self.y_max + dy_carte
+            self.x_min = self.x_min + dx_carte
+            self.x_max = self.x_max + dx_carte
+            self.initialise_graph()
+            self.graph_it()
 
     def remove_point_show(self,*args):
+        """
+        On mouse up, remove the point show, if one was displayed
+        """
         if self.point_show != None:
             self.remove_widget(self.point_show)
             self.point_show = None
 
     def graph_mouse_pos(self,*args):
         """
-        Checks if the mouse is over the graph canvas then zooms in/out if scroll whell is used
+        Checks if the mouse is over the graph canvas then zooms in/out if scroll wheel is used
         :param args:
-        :return:
         """
-        if not self.popup_active:
-            x_px = int(args[1].pos[0])
-            y_px = int(args[1].pos[1])
-            if self.graph.collide_point(x_px,y_px):
-                btn = args[1].button
-                if btn == "scrollup":
-                    zoom_factor = 1.05
-                elif btn == "scrolldown":
-                    zoom_factor = 0.95
-                elif btn == "left":
-                    # Don't plot points if graph is currently playing with anim vars
-                    graph_x_px = x_px-self.graph.pos[0]
-                    graph_y_px = y_px-self.graph.pos[1]
-                    logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
-                    # Loop through cords
-                    cur_min_delta = 6
-                    cur_optimum_point = None
-                    cur_function = None
-                    for f_no,set in enumerate(self.cords):
-                        for i in range(0,len(set),2):
-                            x = set[i]
-                            y = set[i+1]
-                            delta = ((graph_x_px-x)**2+(graph_y_px-y)**2)**0.5
-                            if delta < 5 and delta < cur_min_delta:
-                                cur_optimum_point = (x,y)
-                                cur_min_delta = delta
-                                cur_function = f_no
-                                # Within 5 px radius
-                                logger.info("New optimum point: {}".format(cur_optimum_point))
+        if self.popup_active:
+            return True
 
-                    if cur_optimum_point != None:
-                        self.point_show = ShowPoint(self,cur_optimum_point,self.function_inputs[cur_function][0].text)
-                        self.add_widget(self.point_show)
+        x_px = int(args[1].pos[0])
+        y_px = int(args[1].pos[1])
+        if self.graph.collide_point(x_px,y_px):
+            btn = args[1].button
+            if btn == "scrollup":
+                zoom_factor = 1.05
+            elif btn == "scrolldown":
+                zoom_factor = 0.95
+            elif btn == "left":
+                # If the mouse press is near a line (within 5px), then display a ShowPoint widget
+                graph_x_px = x_px-self.graph.pos[0]
+                graph_y_px = y_px-self.graph.pos[1]
+                logger.info("Press at: {} {}".format(graph_x_px,graph_y_px))
+                # Loop through cords
+                cur_min_delta = 6
+                cur_optimum_point = None
+                cur_function = None
+                for f_no,set in enumerate(self.cords):
+                    for i in range(0,len(set),2):
+                        x = set[i]
+                        y = set[i+1]
+                        delta = ((graph_x_px-x)**2+(graph_y_px-y)**2)**0.5
+                        if delta < 5 and delta < cur_min_delta:
+                            cur_optimum_point = (x,y)
+                            cur_min_delta = delta
+                            cur_function = f_no
+                            # Within 5 px radius
+                            logger.debug("New optimum point: {}".format(cur_optimum_point))
 
-                    return True
-                else:
-                    return False
+                if cur_optimum_point != None:
+                    self.point_show = ShowPoint(self,cur_optimum_point,self.function_inputs[cur_function][0].text)
+                    self.add_widget(self.point_show)
 
-                self.x_max *= zoom_factor
-                self.x_min *= zoom_factor
-                self.y_max *= zoom_factor
-                self.y_min *= zoom_factor
-                self.initialise_graph()
-                self.graph_it()
+                return True
+            else:
+                return False
+
+            self.x_max *= zoom_factor
+            self.x_min *= zoom_factor
+            self.y_max *= zoom_factor
+            self.y_min *= zoom_factor
+            self.initialise_graph()
+            self.graph_it()
 
     def update_lims(self,x_min,x_max,y_min,y_max,x_step,y_step):
         """
@@ -258,6 +267,10 @@ class GraphingCalc(Widget):
         self.graph_it()
 
     def pause_play(self,btn):
+        """
+        Handles the play/pause button for the animated variables
+        :param btn: Instance of the play/pause button
+        """
         if self.graph_it_loop == None:
             # Start animated vars
             if self.anim_vars != []:
@@ -278,6 +291,12 @@ class GraphingCalc(Widget):
             btn.text = "Play"
 
     def generate_axes(self,pos,size,col):
+        """
+        Method to generate an axis, automatically draws to canvas
+        :param pos: (X,Y) tuple of one end of the axis
+        :param size: (Width,Height) tuple of the size
+        :param col: (R,G,B,A) of colour of line
+        """
         # Check axis won't go outside of canvas
         if pos[0] < 0 or pos[1] > self.graph_height:
             return False
@@ -311,6 +330,13 @@ class GraphingCalc(Widget):
 
 
     def graph_it(self,reinitialse=False,update_point_show=False):
+        """
+        Method that handles the calculations of the position of the points, and plots them
+        :param reinitialise: If true, will clear the graph completely and re-initialise it,
+        defaults to False
+        :param update_point_show: If true will recalculate the x and y values for the existing
+        point show using the same x pixel value
+        """
         self.cords = []
         with self.graph.canvas:
             if reinitialse:
@@ -332,19 +358,14 @@ class GraphingCalc(Widget):
                 points = []
                 cur_seg = []
 
-                # Parse the function line still with "x"s, then just evaluate the RPN line
-                # with "x"s replaced for values
+                # Convert the function line into reverse polish but don't evaluate it
                 rpn_line = calculations.parse_line(f_line,evaluate=False)
 
                 for px_x in range(0, self.graph_width,2):
-                    set_none = False
-                    # ignore_next = False
                     carte_x = self.px_to_carte(px_x, 0)[0]
                     try:
                         carte_y = calculations.eval_rpn(rpn_line,carte_x)
                     except Exception:
-                        prev_x = None
-                        prev_y = None
                         continue
 
                     px_x, px_y = self.carte_to_px(carte_x,carte_y)
@@ -409,6 +430,9 @@ class GraphingCalc(Widget):
                 Translate(xy=self.pos)
 
     def add_function(self):
+        """
+        Button handler for the add function button
+        """
         container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:40,1:190,2:95},cols=3,
                                spacing=(5,5))
         new_input = TextInput(write_tab=False)
