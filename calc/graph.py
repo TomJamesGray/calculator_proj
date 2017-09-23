@@ -334,6 +334,9 @@ class GraphingCalc(Widget):
             # Graph each function in function_inputs
             for func in self.function_inputs:
                 f_line = self.insert_anim_vars(func[0].text)
+                if f_line == "":
+                    # Don't try and evaluate an empty line
+                    return True
                 func_col = self.colour_maps[func[1].text]
                 func_cords = []
                 points = []
@@ -383,6 +386,13 @@ class GraphingCalc(Widget):
                 points.append(cur_seg)
                 Color(*func_col[0:3])
                 for seg in points:
+                    if points == [[]]:
+                        # Function line is invalid, so points list is empty
+                        # Colour function input red to signal error
+                        func[0].background_color = (225/255,55/255,55/255,1)
+                    else:
+                        func[0].background_color = (1,1,1,1)
+
                     [func_cords.append(x) for x in seg]
                     if func_col[4]:
                         # Dashed line
