@@ -304,14 +304,12 @@ class GraphingCalc(Widget):
             Color(*col)
             Rectangle(pos=pos,size=size)
 
-    def insert_anim_vars(self,f_line,step=True):
+    def get_anim_vars(self,step=True):
         """
-        Inserts and by default steps over any anim vars
-        :param f_line: The function line to be modified and evaluated
-        :param step: Whether to step over the anim vars, defaults to True
-        :return: Modified function line with anim vars
+        Steps over the anim vars by default and returns them
+        :param step: Boolean, step over the anim vars or leave them as is
+        :return: a list with dictionaries in the form [{"name":name,"val":val},..]
         """
-        # Step over any anim_vars
         cur_anim_vars = []
         if self.anim_vars != []:
             for var in self.anim_vars:
@@ -320,14 +318,7 @@ class GraphingCalc(Widget):
                 else:
                     x = var.current
                 cur_anim_vars.append({"name": var.name_in.text, "val": x})
-
-        # Insert any anim vars
-        if self.anim_vars != []:
-            for var in cur_anim_vars:
-                f_line = f_line.replace(var["name"], str(var["val"]))
-
-        return f_line
-
+        return cur_anim_vars
 
     def graph_it(self,reinitialse=False,update_point_show=False):
         """
@@ -346,9 +337,11 @@ class GraphingCalc(Widget):
                 logger.info("Updating point show")
                 self.point_show.update()
 
+
+            cur_anim_vars = self.get_anim_vars()
             # Graph each function in function_inputs
             for func in self.function_inputs:
-                f_line = self.insert_anim_vars(func[0].text)
+                f_line = func[0].text
                 if f_line == "":
                     # Don't try and evaluate an empty line
                     return True
@@ -364,7 +357,7 @@ class GraphingCalc(Widget):
                 for px_x in range(0, self.graph_width,2):
                     carte_x = self.px_to_carte(px_x, 0)[0]
                     try:
-                        carte_y = calculations.eval_rpn(rpn_line,carte_x)
+                        carte_y = calculations.eval_rpn(rpn_line,carte_x,cur_anim_vars)
                     except Exception:
                         continue
 
@@ -538,7 +531,8 @@ class ShowPoint(Widget):
         logger.debug("Moving x to x_px (on canvas) to {}:".format(x))
         new_x_carte = self.graph.px_to_carte(x,0)[0]
         # Get new cartesian y value with new x val
-        new_y_carte = calculations.parse_line(self.graph.insert_anim_vars(self.func_line),x=new_x_carte)
+        cur_anim_vars = self.graph.get_anim_vars()
+        new_y_carte = calculations.parse_line(self.func_line,x=new_x_carte,anim_vars=cur_anim_vars)
 
         logger.debug("New cartesian co-ords: {} {}".format(new_x_carte,new_y_carte))
         x_px,y_px = self.graph.carte_to_px(new_x_carte,new_y_carte)

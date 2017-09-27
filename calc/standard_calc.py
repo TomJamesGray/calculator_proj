@@ -37,7 +37,7 @@ logging_config = {
         "f_parsing": {
             "class": "logging.StreamHandler",
             "formatter": "main",
-            "level": logging.ERROR},
+            "level": logging.INFO},
         "gui": {
             "class": "logging.StreamHandler",
             "formatter": "main",
@@ -53,7 +53,7 @@ logging_config = {
         },
         "calc.calculations": {
             "handlers": ["f_parsing"],
-            "level": logging.ERROR},
+            "level": logging.INFO},
     }
 }
 print("Setting up logging")

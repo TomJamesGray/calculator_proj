@@ -100,7 +100,7 @@ unary_operators = {
 
 logger = logging.getLogger(__name__)
 
-def parse_line(calc_line,evaluate=True,ans=None,x=None):
+def parse_line(calc_line,evaluate=True,ans=None,x=None,anim_vars=None):
     """
     Parses a given equation by converting infix to reverse polish
     :param calc_line: The equation
@@ -181,12 +181,12 @@ def parse_line(calc_line,evaluate=True,ans=None,x=None):
 
     logger.info("RPN line at end of parsing: {}".format(rpn_line))
     if evaluate:
-        val = eval_rpn(rpn_line,x)
+        val = eval_rpn(rpn_line,x,anim_vars)
         return val
     else:
         return rpn_line
 
-def eval_rpn(rpn_line,x):
+def eval_rpn(rpn_line,x,anim_vars=None):
     global functions
     eval_stack = []
     for c in rpn_line:
@@ -205,6 +205,12 @@ def eval_rpn(rpn_line,x):
             logger.debug("Adding value from function {} to stack".format(val))
         else:
             logger.debug("Adding {} to eval_stack".format(c))
+            # Replace any anim vars
+            # TODO add ability to multiple anim vars together like AB
+            for a_var in anim_vars:
+                if a_var["name"] in c:
+                    c = c.replace(a_var["name"],str(a_var["val"]))
+
             if c.endswith("x"):
                 if len(c) > 1:
                     c = str(float(c[:-1]) * x)
