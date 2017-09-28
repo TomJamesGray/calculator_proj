@@ -422,14 +422,22 @@ class GraphingCalc(Widget):
 
                 Translate(xy=self.pos)
 
+    def func_input_text_change(self,instance,*args):
+        """
+        Function called when any of the funciton inputs are changed
+        """
+        instance.parse_pi()
+        self.graph_it()
+
     def add_function(self):
         """
         Button handler for the add function button
         """
+
         container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:40,1:190,2:95},cols=3,
                                spacing=(5,5))
-        new_input = TextInput(write_tab=False)
-        new_input.bind(text=self.graph_it)
+        new_input = FunctionInput(write_tab=False)
+        new_input.bind(text=self.func_input_text_change)
         new_col_input = ColourSpinner()
         delete_func = Button(text="Del")
         delete_func.bind(on_press=self.delete_function)
@@ -497,6 +505,9 @@ class FloatInput(TextInput):
 
         return super(FloatInput,self).insert_text(out_str,from_undo=from_undo)
 
+class FunctionInput(TextInput):
+    def parse_pi(self):
+        self.text = self.text.replace("pi","π")
 
 class LimitsPopup(Popup):
     max_x_input = ObjectProperty(None)
