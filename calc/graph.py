@@ -463,9 +463,9 @@ class GraphingCalc(Widget):
         """
         container = GridLayout(cols=8)
         name = TextInput(write_tab=False,font_size="10sp")
-        min = TextInput(write_tab=False,font_size="10sp")
-        max = TextInput(write_tab=False,font_size="10sp")
-        step = TextInput(write_tab=False,font_size="10sp")
+        min = FloatInput(write_tab=False,font_size="10sp")
+        max = FloatInput(write_tab=False,font_size="10sp")
+        step = FloatInput(write_tab=False,font_size="10sp")
         self.anim_vars.append(AnimVar(name,min,max,step))
 
         container.add_widget(Label(font_size="10sp",text="Name"))
@@ -482,6 +482,21 @@ class GraphingCalc(Widget):
     def adjust_axes_btn(self):
         self.popup_active = True
         LimitsPopup(self).open()
+
+class FloatInput(TextInput):
+    def insert_text(self, substring, from_undo=False):
+        # Only allow 0 to 9, ".", "-"
+        allowed_chars = [str(x) for x in range(10)]
+        allowed_chars.append(".")
+        allowed_chars.append("-")
+
+        out_str = ""
+        for c in substring:
+            if c in allowed_chars:
+                out_str += c
+
+        return super(FloatInput,self).insert_text(out_str,from_undo=from_undo)
+
 
 class LimitsPopup(Popup):
     max_x_input = ObjectProperty(None)
