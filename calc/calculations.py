@@ -188,14 +188,14 @@ def parse_line(calc_line,evaluate=True,ans=None,x=None,anim_vars=None):
     else:
         return rpn_line
 
+
 def eval_rpn(rpn_line,x,anim_vars=None):
     global functions,constants
     eval_stack = []
-
     all_vars = copy.copy(constants)
-    if anim_vars != None or anim_vars != []:
-        all_vars.append(anim_vars)
-    print(all_vars)
+    # Don't add empty anim_vars to all_vars
+    if not (anim_vars == [] or anim_vars == None):
+        all_vars.append(*anim_vars)
 
     for c in rpn_line:
         if c in functions:
@@ -214,11 +214,8 @@ def eval_rpn(rpn_line,x,anim_vars=None):
         else:
 
             logger.debug("Adding {} to eval_stack".format(c))
-            # Replace any anim vars
-            # TODO add ability to multiple anim vars together like AB
-
-            print("all vars: {}".format(all_vars))
-            print(constants)
+            # Replace any vars
+            # TODO add ability to multiply vars together like AB
             for a_var in all_vars:
                 if a_var["name"] in c:
                     c = c.replace(a_var["name"],str(a_var["val"]))
