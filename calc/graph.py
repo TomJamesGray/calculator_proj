@@ -429,7 +429,7 @@ class GraphingCalc(Widget):
         Function called when any of the funciton inputs are changedpipi
         """
         instance.parse_pi()
-        self.graph_it()
+        self.graph_it(reinitialse=True)
 
     def add_function(self):
         """
