@@ -15,6 +15,7 @@ from calc import calculations
 from calc.helpers import float_range,float_round,float_to_str
 
 logger = logging.getLogger(__name__)
+line_width = 1.01
 
 class ColourSpinner(Spinner):
     pass
@@ -328,6 +329,7 @@ class GraphingCalc(Widget):
         :param update_point_show: If true will recalculate the x and y values for the existing
         point show using the same x pixel value
         """
+        global line_width
         self.cords = []
         with self.graph.canvas:
             if reinitialse:
@@ -412,10 +414,10 @@ class GraphingCalc(Widget):
                                 dashed_segs.append([])
 
                         for seg in dashed_segs:
-                            Line(points=seg,width=1)
+                            Line(points=seg,width=line_width)
 
                     else:
-                        Line(points=seg,width=1)
+                        Line(points=seg,width=line_width)
 
                 self.cords.append(func_cords)
 
