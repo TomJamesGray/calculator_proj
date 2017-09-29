@@ -1,7 +1,9 @@
 import logging
 import re
 import math
+import copy
 
+constants =[{"name":"π","val":math.pi}]
 
 functions = {
     "+":{
@@ -187,8 +189,14 @@ def parse_line(calc_line,evaluate=True,ans=None,x=None,anim_vars=None):
         return rpn_line
 
 def eval_rpn(rpn_line,x,anim_vars=None):
-    global functions
+    global functions,constants
     eval_stack = []
+
+    all_vars = copy.copy(constants)
+    if anim_vars != None or anim_vars != []:
+        all_vars.append(anim_vars)
+    print(all_vars)
+
     for c in rpn_line:
         if c in functions:
             logger.debug("Evaluating function {}".format(c))
@@ -204,10 +212,14 @@ def eval_rpn(rpn_line,x,anim_vars=None):
             eval_stack.append(val)
             logger.debug("Adding value from function {} to stack".format(val))
         else:
+
             logger.debug("Adding {} to eval_stack".format(c))
             # Replace any anim vars
             # TODO add ability to multiple anim vars together like AB
-            for a_var in anim_vars:
+
+            print("all vars: {}".format(all_vars))
+            print(constants)
+            for a_var in all_vars:
                 if a_var["name"] in c:
                     c = c.replace(a_var["name"],str(a_var["val"]))
 

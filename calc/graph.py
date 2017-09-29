@@ -356,8 +356,9 @@ class GraphingCalc(Widget):
 
                 for px_x in range(0, self.graph_width,2):
                     carte_x = self.px_to_carte(px_x, 0)[0]
+                    carte_y = calculations.eval_rpn(rpn_line,carte_x,cur_anim_vars)
                     try:
-                        carte_y = calculations.eval_rpn(rpn_line,carte_x,cur_anim_vars)
+                        pass
                     except Exception:
                         continue
 
@@ -424,7 +425,7 @@ class GraphingCalc(Widget):
 
     def func_input_text_change(self,instance,*args):
         """
-        Function called when any of the funciton inputs are changed
+        Function called when any of the funciton inputs are changedpipi
         """
         instance.parse_pi()
         self.graph_it()
