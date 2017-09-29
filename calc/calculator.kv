@@ -33,7 +33,7 @@
     font_size:"12sp"
     height:20
     background_normal:""
-    background_color:(1,1,1,1)
+    background_color:(181/255,181/255,181/255,1)
     color:(0,0,0,1)
 
 <ColourSpinner>
@@ -42,7 +42,7 @@
     sync_height:True
 #    height:20
     font_size:"12sp"
-    background_color:(1,1,1,1)
+    background_color:(181/255,181/255,181/255,1)
     background_normal:""
     color:(0,0,0,1)
     option_cls:Factory.get("ColourSpinnerOption")
@@ -129,8 +129,15 @@
 
 <GraphingCalc>
     function_grid:function_grid
-
+    canvas.before:
+        Color:
+            rgba:(45/255,45/255,45/255,1)
+        Rectangle:
+            pos:self.pos
+            size:self.size
     ActionBar:
+        background_image:""
+        background_color:(.1,.1,.1,1)
         width:root.width
         size_hint_x:1
         height:40
@@ -149,21 +156,31 @@
 
     GridLayout:
         cols:2
-        pos:(0,root.height-105)
+        pos:(0,root.height-100)
         width:340
         height:60
         row_default_height:30
+        padding:(0,0)
+        spacing:(3,3)
         row_force_default:True
         Button:
+            background_normal:""
+            background_color:(243/255,137/255,44/255,1)
             text:"Add function"
             on_press:root.add_function()
         Button:
+            background_normal:""
+            background_color:(243/255,137/255,44/255,1)
             text:"Add variable"
             on_press:root.add_anim_var()
         Button:
+            background_normal:""
+            background_color:(243/255,137/255,44/255,1)
             text:"Play"
             on_press:root.pause_play(self)
         Button:
+            background_normal:""
+            background_color:(243/255,137/255,44/255,1)
             text:"Adjust axes"
             on_press:root.adjust_axes_btn()
 
@@ -178,7 +195,7 @@
             size_hint_y:None
             pos:(0,root.height-40)
             padding:0,10
-            spacing:5,5
+            spacing:5,2
             height:self.minimum_height
             cols:1
-            row_default_height:30
+            row_default_height:50

@@ -16,6 +16,8 @@ from calc.helpers import float_range,float_round,float_to_str
 
 logger = logging.getLogger(__name__)
 line_width = 1.01
+accent_col = (181/255,181/255,181/255,1)
+
 
 class ColourSpinner(Spinner):
     pass
@@ -44,6 +46,7 @@ class GraphingCalc(Widget):
         self.graph_it_loop = None
         self.point_show = None
         self.popup_active = False
+        self.function_bg_col = (.1,.1,.1,1)
         self.cords = []
         self.graph = RelativeLayout(pos=(340,0),width=self.graph_width,height=self.graph_height)
         Window.bind(on_touch_down=self.graph_mouse_pos)
@@ -397,7 +400,7 @@ class GraphingCalc(Widget):
                         # Colour function input red to signal error
                         func[0].background_color = (225/255,55/255,55/255,1)
                     else:
-                        func[0].background_color = (1,1,1,1)
+                        func[0].background_color = self.function_bg_col
 
                     [func_cords.append(x) for x in seg]
                     if func_col[4]:
@@ -436,12 +439,13 @@ class GraphingCalc(Widget):
         Button handler for the add function button
         """
 
-        container = GridLayout(row_default_height=30,row_force_default=True,cols_minimum={0:40,1:190,2:95},cols=3,
-                               spacing=(5,5))
-        new_input = FunctionInput(write_tab=False)
+        container = GridLayout(row_default_height=50,row_force_default=True,cols_minimum={0:40,1:205,2:95},cols=3,
+                               spacing=(0,5))
+        new_input = FunctionInput(write_tab=False,multiline=False,font_size=18,padding_y=12,
+                                  background_color=self.function_bg_col,foreground_color=(1,1,1,1),cursor_color=(1,1,1,1))
         new_input.bind(text=self.func_input_text_change)
         new_col_input = ColourSpinner()
-        delete_func = Button(text="Del")
+        delete_func = Button(text="X",background_color=accent_col,background_normal="",color=(0,0,0,1))
         delete_func.bind(on_press=self.delete_function)
 
         self.function_inputs.append([new_input,new_col_input,delete_func])
