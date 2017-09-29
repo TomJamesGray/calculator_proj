@@ -3,7 +3,10 @@ import re
 import math
 import copy
 
-constants =[{"name":"π","val":math.pi}]
+constants =[
+    {"name":"π","val":math.pi},
+    {"name":"e","val":math.e}
+]
 
 functions = {
     "+":{
